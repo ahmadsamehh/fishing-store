@@ -217,3 +217,7 @@ input, select, textarea, button { font: inherit; color: inherit; }
 .login label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; }
 .login input { border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; min-height: 44px; font-weight: 400; }
 .admin-bar { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-bottom: 16px; font-size: 14px; }
+
+/* WhatsApp order button */
+.btn-whatsapp { background: #1A7F4B; color: #FFFFFF; align-self: flex-start; }
+.btn-whatsapp:hover:not(:disabled) { background: #146B3E; color: #FFFFFF; }

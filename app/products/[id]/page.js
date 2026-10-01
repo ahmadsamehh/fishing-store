@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useStore, formatPrice, finalPrice } from '@/lib/store';
 import ProductImage from '@/components/ProductImage';
+import { WHATSAPP_NUMBER } from '@/lib/config';
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -22,6 +23,20 @@ export default function ProductPage() {
 
   const onSale = product.salePrice && product.salePrice < product.price;
   const stock = Number(product.stock);
+
+  const orderOnWhatsApp = () => {
+    const lines = [
+      'Hi, I want to buy this:',
+      '',
+      `Product: ${product.name}`,
+      product.brand && `Brand: ${product.brand}`,
+      `Price: ${formatPrice(finalPrice(product))}`,
+      `Quantity: ${qty}`,
+      `Link: ${window.location.href}`,
+    ].filter((l) => l !== false && l !== undefined && l !== null);
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
+    window.open(url, '_blank', 'noopener');
+  };
 
   return (
     <div className="wrap section">
@@ -47,6 +62,10 @@ export default function ProductPage() {
               Add to cart
             </button>
           </div>
+          <button className="btn btn-whatsapp" disabled={stock <= 0} onClick={orderOnWhatsApp}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+            Order on WhatsApp
+          </button>
           {added && <p className="notice">Added to your cart. <Link href="/cart">View cart</Link></p>}
           <h2>Description</h2>
           <p className="pdp-desc">{product.description}</p>
