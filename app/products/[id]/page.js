@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useStore, formatPrice, finalPrice } from '@/lib/store';
 import ProductImage from '@/components/ProductImage';
 import { WHATSAPP_NUMBER } from '@/lib/config';
+import QtyInput from '@/components/QtyInput';
+import { categoryHref } from '@/lib/catalog';
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -29,11 +31,11 @@ export default function ProductPage() {
       'Hi, I want to buy this:',
       '',
       `Product: ${product.name}`,
-      product.brand && `Brand: ${product.brand}`,
+      product.brand ? `Brand: ${product.brand}` : null,
       `Price: ${formatPrice(finalPrice(product))}`,
       `Quantity: ${qty}`,
       `Link: ${window.location.href}`,
-    ].filter((l) => l !== false && l !== undefined && l !== null);
+    ].filter((l) => l !== null);
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
     window.open(url, '_blank', 'noopener');
   };
@@ -41,7 +43,9 @@ export default function ProductPage() {
   return (
     <div className="wrap section">
       <nav className="crumbs" aria-label="Breadcrumb">
-        <Link href="/">Home</Link> / <Link href={`/products?category=${encodeURIComponent(product.category)}`}>{product.category}</Link> / <span>{product.name}</span>
+        <Link href="/">Home</Link> / <Link href={categoryHref(product.category)}>{product.category}</Link> /{' '}
+        {product.subcategory && (<><Link href={categoryHref(product.category, product.subcategory)}>{product.subcategory}</Link> /{' '}</>)}
+        <span>{product.name}</span>
       </nav>
       <div className="pdp">
         <div className="pdp-img"><ProductImage product={product} /></div>
@@ -56,8 +60,7 @@ export default function ProductPage() {
             {stock > 0 ? (stock <= 5 ? `Only ${stock} left in stock` : 'In stock') : 'Out of stock'}
           </p>
           <div className="pdp-buy">
-            <label className="sr-only" htmlFor="qty">Quantity</label>
-            <input id="qty" type="number" min="1" max={Math.max(stock, 1)} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} />
+            <QtyInput id="qty" value={qty} onChange={setQty} max={Math.max(stock, 1)} />
             <button className="btn btn-dark" disabled={stock <= 0} onClick={() => { addToCart(product.id, qty); setAdded(true); }}>
               Add to cart
             </button>

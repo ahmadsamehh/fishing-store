@@ -1,15 +1,16 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useStore } from '@/lib/store';
-import { CATEGORIES } from '@/lib/seed';
-import { SearchIcon, UserIcon, HeartIcon, CartIcon, Logo } from './Icons';
+import { SearchIcon, UserIcon, CartIcon, Logo } from './Icons';
+import MegaMenu from './MegaMenu';
 
 export default function Header() {
-  const { cartCount } = useStore();
+  const { cartCount, session, isAdmin } = useStore();
   const router = useRouter();
   const [q, setQ] = useState('');
+  const name = session?.user?.user_metadata?.full_name?.split(' ')[0];
 
   const submit = (e) => {
     e.preventDefault();
@@ -24,25 +25,20 @@ export default function Header() {
           <span className="brand-mark"><Logo /></span>
           <span className="brand-name">Marjan</span>
         </Link>
+        <Suspense fallback={<span className="mm-toggle">Menu</span>}>
+          <MegaMenu />
+        </Suspense>
         <form className="search" onSubmit={submit} role="search">
           <label htmlFor="q" className="sr-only">Search the store</label>
           <input id="q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search products, brands or categories" />
           <button type="submit" aria-label="Search"><SearchIcon /></button>
         </form>
         <nav className="header-actions" aria-label="Account">
-          <Link href="#" className="icon-link"><UserIcon /><span>Sign in</span></Link>
-          <Link href="#" className="icon-btn" aria-label="Wish list"><HeartIcon /></Link>
-          <Link href="/cart" className="cart-link"><CartIcon /><span>Cart</span><span className="count">{cartCount}</span></Link>
+          {isAdmin && <Link href="/admin" className="icon-link admin-link">Store admin</Link>}
+          <Link href="/account" className="icon-link"><UserIcon /><span>{session ? (name ? `Hi, ${name}` : 'My account') : 'Sign in'}</span></Link>
+          <Link href="/cart" className="cart-link" aria-label={`Cart, ${cartCount} items`}><CartIcon /><span>Cart</span><span className="count">{cartCount}</span></Link>
         </nav>
       </div>
-      <nav className="catbar" aria-label="Categories">
-        <div className="wrap catbar-inner">
-          {CATEGORIES.map((c) => (
-            <Link key={c} href={`/products?category=${encodeURIComponent(c)}`}>{c}</Link>
-          ))}
-          <Link href="/products?sale=1" className="deals">Deals</Link>
-        </div>
-      </nav>
     </header>
   );
 }

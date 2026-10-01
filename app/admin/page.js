@@ -3,10 +3,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useStore, formatPrice } from '@/lib/store';
 import { supabaseConfigured } from '@/lib/supabase';
-import { CATEGORIES } from '@/lib/seed';
+import { CATEGORIES, subsOf } from '@/lib/catalog';
 import ProductImage from '@/components/ProductImage';
 
-const EMPTY = { name: '', brand: '', category: CATEGORIES[0], price: '', salePrice: '', stock: '', featured: false, image: '', description: '' };
+const EMPTY = { name: '', brand: '', category: CATEGORIES[0], subcategory: '', price: '', salePrice: '', stock: '', featured: false, image: '', description: '' };
 
 // Shrinks a photo before upload so pages stay fast.
 function resizeImage(file, max = 1200) {
@@ -112,8 +112,15 @@ function ProductForm({ initial, onSave, onCancel }) {
           <label className="full">Product name<input value={form.name} onChange={set('name')} /></label>
           <label>Brand<input value={form.brand} onChange={set('brand')} /></label>
           <label>Category
-            <select value={form.category} onChange={set('category')}>
+            <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value, subcategory: '' })}>
+              {!CATEGORIES.includes(form.category) && form.category && <option value={form.category}>{form.category} (old)</option>}
               {CATEGORIES.map((c) => (<option key={c}>{c}</option>))}
+            </select>
+          </label>
+          <label>Subcategory
+            <select value={form.subcategory || ''} onChange={set('subcategory')}>
+              <option value="">None</option>
+              {subsOf(form.category).map((s) => (<option key={s}>{s}</option>))}
             </select>
           </label>
           <label>Price (EGP)<input type="number" min="0" step="any" value={form.price} onChange={set('price')} /></label>
@@ -214,7 +221,7 @@ function Panel() {
                     <div><Link href={`/products/${p.id}`}><strong>{p.name}</strong></Link><span className="muted">{p.brand}</span></div>
                   </div>
                 </td>
-                <td>{p.category}</td>
+                <td>{p.category}{p.subcategory && <span className="muted t-sub">{p.subcategory}</span>}</td>
                 <td>{p.salePrice ? (<><strong>{formatPrice(p.salePrice)}</strong> <s className="muted">{formatPrice(p.price)}</s></>) : formatPrice(p.price)}</td>
                 <td><span className={Number(p.stock) > 0 ? 'pill pill-ok' : 'pill pill-out'}>{Number(p.stock) > 0 ? p.stock : 'Out'}</span></td>
                 <td className="t-actions">

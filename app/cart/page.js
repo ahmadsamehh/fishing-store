@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useStore, formatPrice, finalPrice } from '@/lib/store';
 import ProductImage from '@/components/ProductImage';
+import QtyInput from '@/components/QtyInput';
 
 export default function CartPage() {
   const { cart, products, setCartQty } = useStore();
@@ -23,8 +24,7 @@ export default function CartPage() {
                   <Link href={`/products/${l.id}`}><strong>{l.product.name}</strong></Link>
                   <span className="muted">{formatPrice(finalPrice(l.product))} each</span>
                 </div>
-                <label className="sr-only" htmlFor={`q-${l.id}`}>Quantity</label>
-                <input id={`q-${l.id}`} type="number" min="0" value={l.qty} onChange={(e) => setCartQty(l.id, Number(e.target.value) || 0)} />
+                <QtyInput id={`q-${l.id}`} value={l.qty} onChange={(n) => setCartQty(l.id, n)} max={Math.max(Number(l.product.stock), 1)} />
                 <strong>{formatPrice(finalPrice(l.product) * l.qty)}</strong>
                 <button className="link-btn" onClick={() => setCartQty(l.id, 0)}>Remove</button>
               </li>
@@ -32,8 +32,9 @@ export default function CartPage() {
           </ul>
           <aside className="cart-summary">
             <div className="row"><span>Subtotal</span><strong>{formatPrice(total)}</strong></div>
-            <p className="muted">Shipping and payment come in the next phase.</p>
-            <button className="btn btn-dark" disabled>Checkout (coming soon)</button>
+            <p className="muted">Delivery cost is confirmed with you on WhatsApp.</p>
+            <Link href="/checkout" className="btn btn-whatsapp btn-block">Checkout on WhatsApp</Link>
+            <Link href="/products" className="btn btn-outline btn-block">Continue shopping</Link>
           </aside>
         </div>
       )}

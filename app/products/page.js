@@ -2,7 +2,7 @@
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useStore, finalPrice } from '@/lib/store';
-import { CATEGORIES } from '@/lib/seed';
+import { CATEGORIES, subsOf } from '@/lib/catalog';
 import ProductCard from '@/components/ProductCard';
 
 function Listing() {
@@ -11,17 +11,20 @@ function Listing() {
   const { products, ready, loadError } = useStore();
   const q = (params.get('q') || '').toLowerCase();
   const category = params.get('category') || '';
+  const sub = params.get('sub') || '';
   const sale = params.get('sale') === '1';
   const sort = params.get('sort') || 'featured';
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(params.toString());
     value ? next.set(key, value) : next.delete(key);
+    if (key === 'category') next.delete('sub');
     router.push(`/products?${next.toString()}`);
   };
 
   let list = products.filter((p) => {
     if (category && p.category !== category) return false;
+    if (sub && p.subcategory !== sub) return false;
     if (sale && !(p.salePrice && p.salePrice < p.price)) return false;
     if (q && !`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q)) return false;
     return true;
@@ -30,7 +33,8 @@ function Listing() {
   if (sort === 'high') list = [...list].sort((a, b) => finalPrice(b) - finalPrice(a));
   if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
 
-  const title = sale ? 'Deals' : category || (q ? `Results for "${params.get('q')}"` : 'All products');
+  if (sort === 'new') list = [...list]; // already newest first from the database
+  const title = sale ? 'Deals' : sub || category || (q ? `Results for "${params.get('q')}"` : 'All products');
 
   return (
     <div className="wrap listing">
@@ -38,7 +42,12 @@ function Listing() {
         <h2>Category</h2>
         <button className={!category ? 'filter on' : 'filter'} onClick={() => setParam('category', '')}>All</button>
         {CATEGORIES.map((c) => (
-          <button key={c} className={category === c ? 'filter on' : 'filter'} onClick={() => setParam('category', c)}>{c}</button>
+          <div key={c}>
+            <button className={category === c && !sub ? 'filter on' : 'filter'} onClick={() => setParam('category', c)}>{c}</button>
+            {category === c && subsOf(c).map((s) => (
+              <button key={s} className={sub === s ? 'filter filter-sub on' : 'filter filter-sub'} onClick={() => setParam('sub', s)}>{s}</button>
+            ))}
+          </div>
         ))}
         <label className="check">
           <input type="checkbox" checked={sale} onChange={(e) => setParam('sale', e.target.checked ? '1' : '')} />
@@ -52,6 +61,7 @@ function Listing() {
             Sort by
             <select value={sort} onChange={(e) => setParam('sort', e.target.value)}>
               <option value="featured">Featured</option>
+              <option value="new">Newest</option>
               <option value="low">Price: low to high</option>
               <option value="high">Price: high to low</option>
               <option value="name">Name</option>

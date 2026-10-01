@@ -3,7 +3,7 @@ import Link from 'next/link';
 const cols = [
   { title: 'About', links: ['About us', 'Terms & conditions', 'Privacy policy'] },
   { title: 'Customer service', links: ['Contact us', 'Shipping & delivery', 'Returns & exchanges', 'Payment methods'] },
-  { title: 'My account', links: ['Sign in', 'My orders', 'Wish list', 'Reward points'] },
+  { title: 'My account', links: [['Sign in or create account', '/account'], ['Cart', '/cart']] },
 ];
 
 export default function Footer() {
@@ -19,7 +19,9 @@ export default function Footer() {
         {cols.map((col) => (
           <div className="footer-col" key={col.title}>
             <span className="footer-title">{col.title}</span>
-            {col.links.map((l) => (<Link key={l} href="#">{l}</Link>))}
+            {col.links.map((l) => (Array.isArray(l)
+              ? <Link key={l[0]} href={l[1]}>{l[0]}</Link>
+              : <Link key={l} href="#">{l}</Link>))}
           </div>
         ))}
       </div>
