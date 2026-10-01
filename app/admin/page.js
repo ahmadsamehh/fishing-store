@@ -2,62 +2,107 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useStore, formatPrice } from '@/lib/store';
+import { supabaseConfigured } from '@/lib/supabase';
 import { CATEGORIES } from '@/lib/seed';
 import ProductImage from '@/components/ProductImage';
 
 const EMPTY = { name: '', brand: '', category: CATEGORIES[0], price: '', salePrice: '', stock: '', featured: false, image: '', description: '' };
 
-// Shrinks a picked photo so it fits in browser storage for the demo.
-function resizeImage(file, max = 700) {
+// Shrinks a photo before upload so pages stay fast.
+function resizeImage(file, max = 1200) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = reject;
-      img.onload = () => {
-        const scale = Math.min(1, max / Math.max(img.width, img.height));
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.8));
-      };
-      img.src = reader.result;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onerror = () => reject(new Error('That file is not an image. Pick a JPG or PNG.'));
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('The photo could not be prepared.'))), 'image/jpeg', 0.85);
     };
-    reader.readAsDataURL(file);
+    img.src = url;
   });
 }
 
-function ProductForm({ initial, onSave, onCancel }) {
-  const [form, setForm] = useState({ ...EMPTY, ...initial });
+function SignIn() {
+  const { signIn } = useStore();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(await signIn(email.trim(), password));
+    setBusy(false);
+  };
+
+  return (
+    <div className="wrap section">
+      <form className="login" onSubmit={submit}>
+        <h1>Store admin</h1>
+        <p className="muted">Sign in to add and edit products.</p>
+        <label>Email<input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+        <label>Password<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
+        {error && <p className="error">{error}</p>}
+        <button className="btn btn-dark" type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+      </form>
+    </div>
+  );
+}
+
+function ProductForm({ initial, onSave, onCancel }) {
+  const { uploadImage } = useStore();
+  const [form, setForm] = useState({ ...EMPTY, ...initial, salePrice: initial?.salePrice ?? '' });
+  const [newPhoto, setNewPhoto] = useState(null); // { blob, preview }
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
 
   const pickImage = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      setForm({ ...form, image: await resizeImage(file) });
-    } catch {
-      setError('That file could not be read as an image. Pick a JPG or PNG.');
+      const blob = await resizeImage(file);
+      setNewPhoto({ blob, preview: URL.createObjectURL(blob) });
+      setError('');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return setError('Add a product name.');
     if (!(Number(form.price) > 0)) return setError('Add a price greater than 0.');
-    if (form.salePrice && Number(form.salePrice) >= Number(form.price)) return setError('The sale price must be lower than the regular price.');
-    onSave({
-      ...form,
-      name: form.name.trim(),
-      brand: form.brand.trim(),
-      price: Number(form.price),
-      salePrice: form.salePrice ? Number(form.salePrice) : null,
-      stock: Number(form.stock) || 0,
-    });
+    if (form.salePrice !== '' && Number(form.salePrice) >= Number(form.price)) return setError('The sale price must be lower than the regular price.');
+    setBusy(true);
+    setError('');
+    try {
+      const image = newPhoto ? await uploadImage(newPhoto.blob) : form.image;
+      await onSave({
+        ...form,
+        image,
+        name: form.name.trim(),
+        brand: form.brand.trim(),
+        price: Number(form.price),
+        salePrice: form.salePrice === '' ? null : Number(form.salePrice),
+        stock: Number(form.stock) || 0,
+      }, initial?.image && image !== initial.image ? initial.image : null);
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
   };
+
+  const preview = { ...form, image: newPhoto ? newPhoto.preview : form.image };
 
   return (
     <div className="modal-back" role="dialog" aria-modal="true" aria-labelledby="form-title">
@@ -71,63 +116,75 @@ function ProductForm({ initial, onSave, onCancel }) {
               {CATEGORIES.map((c) => (<option key={c}>{c}</option>))}
             </select>
           </label>
-          <label>Price (EGP)<input type="number" min="0" value={form.price} onChange={set('price')} /></label>
-          <label>Sale price (optional)<input type="number" min="0" value={form.salePrice ?? ''} onChange={set('salePrice')} /></label>
+          <label>Price (EGP)<input type="number" min="0" step="any" value={form.price} onChange={set('price')} /></label>
+          <label>Sale price (optional)<input type="number" min="0" step="any" value={form.salePrice} onChange={set('salePrice')} /></label>
           <label>Stock quantity<input type="number" min="0" value={form.stock} onChange={set('stock')} /></label>
           <label className="check"><input type="checkbox" checked={form.featured} onChange={set('featured')} />Show in best sellers on the homepage</label>
           <label className="full">Description<textarea rows="4" value={form.description} onChange={set('description')} /></label>
           <div className="full image-field">
-            <div className="image-preview"><ProductImage product={form} /></div>
+            <div className="image-preview"><ProductImage product={preview} /></div>
             <div>
               <label className="btn btn-outline">
-                {form.image ? 'Change photo' : 'Upload photo'}
+                {preview.image ? 'Change photo' : 'Upload photo'}
                 <input type="file" accept="image/*" onChange={pickImage} className="sr-only" />
               </label>
-              {form.image && <button type="button" className="link-btn" onClick={() => setForm({ ...form, image: '' })}>Remove photo</button>}
+              {preview.image && (
+                <button type="button" className="link-btn" onClick={() => { setNewPhoto(null); setForm({ ...form, image: '' }); }}>Remove photo</button>
+              )}
             </div>
           </div>
         </div>
         {error && <p className="error">{error}</p>}
         <div className="modal-actions">
-          <button type="button" className="btn btn-outline" onClick={onCancel}>Cancel</button>
-          <button type="submit" className="btn btn-dark">{initial?.id ? 'Save changes' : 'Add product'}</button>
+          <button type="button" className="btn btn-outline" onClick={onCancel} disabled={busy}>Cancel</button>
+          <button type="submit" className="btn btn-dark" disabled={busy}>
+            {busy ? 'Saving…' : initial?.id ? 'Save changes' : 'Add product'}
+          </button>
         </div>
       </form>
     </div>
   );
 }
 
-export default function AdminPage() {
-  const { products, addProduct, updateProduct, deleteProduct, resetDemo, saveError } = useStore();
-  const [editing, setEditing] = useState(null); // null | {} (new) | product
+function Panel() {
+  const { products, ready, loadError, addProduct, updateProduct, deleteProduct, removeImage, session, signOut } = useStore();
+  const [editing, setEditing] = useState(null);
   const [q, setQ] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const list = products.filter((p) => `${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q.toLowerCase()));
   const outOfStock = products.filter((p) => Number(p.stock) <= 0).length;
 
-  const save = (data) => {
+  const save = async (data, oldImage) => {
     if (editing?.id) {
-      updateProduct(editing.id, data);
+      await updateProduct(editing.id, data);
       setMessage(`Saved changes to “${data.name}”.`);
     } else {
-      addProduct(data);
+      await addProduct(data);
       setMessage(`Added “${data.name}”.`);
     }
+    if (oldImage) await removeImage(oldImage);
+    setError('');
     setEditing(null);
   };
 
-  const remove = (p) => {
-    if (window.confirm(`Delete “${p.name}”? This cannot be undone.`)) {
-      deleteProduct(p.id);
+  const remove = async (p) => {
+    if (!window.confirm(`Delete “${p.name}”? This cannot be undone.`)) return;
+    try {
+      await deleteProduct(p);
       setMessage(`Deleted “${p.name}”.`);
+      setError('');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
     <div className="wrap section admin">
-      <div className="demo-note">
-        Demo mode: changes are saved in this browser only. Once we connect the database, the same screen will save for everyone.
+      <div className="admin-bar">
+        <span className="muted">Signed in as {session.user.email}</span>
+        <button className="link-btn" onClick={signOut}>Sign out</button>
       </div>
       <div className="section-head">
         <h1>Products</h1>
@@ -139,7 +196,7 @@ export default function AdminPage() {
         <div><strong>{products.filter((p) => p.salePrice).length}</strong><span>On sale</span></div>
       </div>
       {message && <p className="notice">{message}</p>}
-      {saveError && <p className="error">{saveError}</p>}
+      {(error || loadError) && <p className="error">{error || loadError}</p>}
       <label className="sr-only" htmlFor="admin-q">Search products</label>
       <input id="admin-q" className="admin-search" type="search" placeholder="Search by name, brand or category" value={q} onChange={(e) => setQ(e.target.value)} />
 
@@ -168,14 +225,36 @@ export default function AdminPage() {
             ))}
           </tbody>
         </table>
-        {!list.length && <div className="empty">No products found. Add one with the button above.</div>}
+        {ready && !list.length && <div className="empty">No products found. Add one with the button above.</div>}
+        {!ready && <div className="empty">Loading products…</div>}
       </div>
-
-      <button className="link-btn reset" onClick={() => window.confirm('Reset all products to the sample list?') && resetDemo()}>
-        Reset to sample products
-      </button>
 
       {editing && <ProductForm initial={editing} onSave={save} onCancel={() => setEditing(null)} />}
     </div>
   );
+}
+
+export default function AdminPage() {
+  const { session, isAdmin, authReady, signOut } = useStore();
+
+  if (!supabaseConfigured) {
+    return (
+      <div className="wrap section">
+        <h1>Store admin</h1>
+        <p className="error">The database keys are missing. Add them in the hosting settings, then redeploy.</p>
+      </div>
+    );
+  }
+  if (!authReady) return <div className="wrap section">Loading…</div>;
+  if (!session) return <SignIn />;
+  if (!isAdmin) {
+    return (
+      <div className="wrap section">
+        <h1>Store admin</h1>
+        <p className="muted">This account ({session.user.email}) does not have admin access.</p>
+        <button className="btn btn-outline" onClick={signOut}>Sign out</button>
+      </div>
+    );
+  }
+  return <Panel />;
 }

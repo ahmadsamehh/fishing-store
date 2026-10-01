@@ -19,7 +19,7 @@ const articles = [
 ];
 
 export default function Home() {
-  const { products } = useStore();
+  const { products, ready, loadError } = useStore();
   const featured = products.filter((p) => p.featured).slice(0, 8);
   const shown = featured.length ? featured : products.slice(0, 8);
 
@@ -69,9 +69,17 @@ export default function Home() {
           <h2>Best sellers</h2>
           <Link href="/products">All products</Link>
         </div>
-        <div className="grid-products">
-          {shown.map((p) => (<ProductCard key={p.id} product={p} />))}
-        </div>
+        {!ready ? (
+          <div className="empty">Loading products…</div>
+        ) : loadError ? (
+          <div className="empty">{loadError}</div>
+        ) : shown.length ? (
+          <div className="grid-products">
+            {shown.map((p) => (<ProductCard key={p.id} product={p} />))}
+          </div>
+        ) : (
+          <div className="empty">New products are on the way.</div>
+        )}
       </section>
 
       <section className="wrap section">

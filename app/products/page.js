@@ -8,7 +8,7 @@ import ProductCard from '@/components/ProductCard';
 function Listing() {
   const params = useSearchParams();
   const router = useRouter();
-  const { products } = useStore();
+  const { products, ready, loadError } = useStore();
   const q = (params.get('q') || '').toLowerCase();
   const category = params.get('category') || '';
   const sale = params.get('sale') === '1';
@@ -59,7 +59,11 @@ function Listing() {
           </label>
         </div>
         <p className="muted">{list.length} products</p>
-        {list.length ? (
+        {!ready ? (
+          <div className="empty">Loading products…</div>
+        ) : loadError ? (
+          <div className="empty">{loadError}</div>
+        ) : list.length ? (
           <div className="grid-products">{list.map((p) => (<ProductCard key={p.id} product={p} />))}</div>
         ) : (
           <div className="empty">No products match these filters. Try another category or clear the search.</div>

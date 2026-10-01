@@ -210,3 +210,10 @@ input, select, textarea, button { font: inherit; color: inherit; }
   .cart-line { grid-template-columns: 60px minmax(0, 1fr) auto; }
   .icon-link span, .cart-link span:not(.count) { display: none; }
 }
+
+/* Admin sign-in */
+.login { max-width: 420px; margin: 24px auto 64px; border: 1px solid var(--line); border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 14px; }
+.login p { margin: 0; }
+.login label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; }
+.login input { border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; min-height: 44px; font-weight: 400; }
+.admin-bar { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-bottom: 16px; font-size: 14px; }
