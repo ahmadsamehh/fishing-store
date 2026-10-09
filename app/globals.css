@@ -837,3 +837,48 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
 .h-tile-all::before { display: none; }
 @media (max-width: 1000px) { .h-tile-all { grid-column: span 2; } }
 @media (max-width: 640px) { .h-tile-all, .h-tile-deals.wide { grid-column: auto; } }
+
+/* =========================================================
+   Admin: same typography and accents as the store
+   ========================================================= */
+.adm-page .section-head h1 { font-size: clamp(30px, 3.4vw, 40px); font-weight: 300; letter-spacing: -0.025em; }
+.adm-page .stats div { border-radius: 16px; padding: 18px 20px; }
+.adm-page .stats strong { font-family: var(--font-body), sans-serif; font-size: 32px; font-weight: 300; letter-spacing: -0.02em; }
+.adm-page .stats span { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.adm-page .filter-tabs button.on { background: var(--ink); }
+.adm-page .table th { text-transform: uppercase; letter-spacing: .06em; font-size: 12px; }
+.adm-page .btn-dark { background: var(--coral); }
+.adm-page .btn-dark:hover:not(:disabled) { background: #D4004F; }
+.adm-page .order { border-radius: 16px; transition: box-shadow .25s ease, border-color .25s ease; }
+.adm-page .order:hover { border-color: #D8CDDC; }
+.adm-page .order[open] { box-shadow: 0 14px 34px rgba(30, 1, 35, .08); }
+.adm-page .order summary { font-size: 15px; }
+.adm-page .order-code { font-weight: 700; letter-spacing: .02em; }
+.ao-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
+.ao-guest { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; }
+.ao-block h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 12px; }
+.ao-block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.ao-block-head h3 { margin: 0; }
+.ao-wa { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #E4F3EA; color: #146B3E; font-size: 13px; font-weight: 600; transition: background-color .2s ease, color .2s ease; }
+.ao-wa:hover { background: #1A7F4B; color: var(--white); }
+.adm-page .kv dt { font-size: 13px; }
+.adm-page .kv dd { font-size: 15px; }
+.adm-page .order-items li { font-size: 15px; }
+
+.ao-status { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; background: var(--mist); border-radius: 14px; padding: 18px 20px; }
+.ao-status-form { display: flex; flex-direction: column; gap: 10px; }
+.ao-status-form > label, .ao-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.ao-status-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.ao-status-row select { flex: 1 1 200px; border: 1.5px solid var(--line); border-radius: 999px; padding: 0 16px; min-height: 44px; background: var(--white); font-size: 15px; }
+.ao-status-row select:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+.ao-status-form p { margin: 0; }
+.ao-history { display: flex; flex-direction: column; gap: 10px; }
+.ao-history ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; max-height: 180px; overflow-y: auto; }
+.ao-history li { position: relative; display: flex; gap: 12px; padding: 0 0 12px; }
+.ao-history li:not(:last-child)::before { content: ''; position: absolute; left: 5px; top: 14px; bottom: 0; width: 2px; background: var(--line); }
+.ao-dot { width: 12px; height: 12px; border-radius: 50%; background: #CFC4D3; margin-top: 4px; flex-shrink: 0; position: relative; }
+.ao-history li.latest .ao-dot { background: var(--coral); box-shadow: 0 0 0 4px var(--coral-soft); }
+.ao-history li span:last-child { display: flex; flex-direction: column; }
+.ao-history strong { font-size: 14px; font-weight: 600; }
+.ao-history small { font-size: 13px; color: var(--muted); }
+@media (max-width: 760px) { .ao-status { grid-template-columns: minmax(0, 1fr); } }

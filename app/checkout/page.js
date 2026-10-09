@@ -79,8 +79,8 @@ export default function CheckoutPage() {
     setSentUrl(url);
     setSentCode(code);
 
-    // Save the order to the customer's history, then empty the cart.
-    if (session) {
+    // Save every order (guests too) so the admin sees it, then empty the cart.
+    {
       placeOrder({
         code,
         items: lines.map((l) => ({
@@ -99,7 +99,7 @@ export default function CheckoutPage() {
         notes: f.notes.trim(),
         message: msg,
       }).then(setSaveError);
-      if (save) saveProfile(f);
+      if (session && save) saveProfile(f);
     }
     clearCart();
   };
