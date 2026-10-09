@@ -31,7 +31,7 @@ function resizeImage(file, max = 1200) {
 }
 
 function SignIn() {
-  const { signIn } = useStore();
+  const { adminSignIn: signIn } = useStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -154,7 +154,7 @@ function ProductForm({ initial, onSave, onCancel }) {
 }
 
 function Panel() {
-  const { products, ready, loadError, addProduct, updateProduct, deleteProduct, removeImage, session, signOut } = useStore();
+  const { products, ready, loadError, addProduct, updateProduct, deleteProduct, removeImage, adminSession: session, adminSignOut: signOut } = useStore();
   const [editing, setEditing] = useState(null);
   const [q, setQ] = useState('');
   const [message, setMessage] = useState('');
@@ -242,7 +242,7 @@ function Panel() {
 }
 
 export default function AdminPage() {
-  const { session, isAdmin, authReady, signOut } = useStore();
+  const { adminSession: session, isAdmin, adminReady: authReady, adminSignOut: signOut } = useStore();
 
   if (!supabaseConfigured) {
     return (
