@@ -46,7 +46,7 @@ export default function Home() {
             <circle cx="55" cy="34" r="5" /><circle cx="147" cy="22" r="5" /><circle cx="50" cy="90" r="5" /><circle cx="155" cy="95" r="5" />
           </svg>
           <span className="tag">Seasonal offer</span>
-          <h1>Everything your reef tank needs, in one place</h1>
+          <h1>Everything your <strong>reef</strong> needs, in <strong>one place</strong></h1>
           <p>Lighting, pumps, filtration, salt and supplements, with advice from people who actually keep reefs.</p>
           <Link href="/products" className="btn btn-light">Shop now</Link>
         </div>

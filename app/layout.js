@@ -1,10 +1,9 @@
 import './globals.css';
-import { IBM_Plex_Sans, Readex_Pro } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { StoreProvider } from '@/lib/store';
 import SiteChrome from '@/components/SiteChrome';
 
-const body = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-body' });
-const display = Readex_Pro({ subsets: ['latin'], weight: ['500', '600', '700'], variable: '--font-display' });
+const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], variable: '--font-inter' });
 
 export const metadata = {
   title: 'Marjan — Reef aquarium supplies',
@@ -13,7 +12,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${body.variable} ${display.variable}`}>
+    <html lang="en" className={inter.variable}>
       <body>
         <StoreProvider>
           <SiteChrome>{children}</SiteChrome>

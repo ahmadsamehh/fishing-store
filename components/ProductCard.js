@@ -12,6 +12,12 @@ export default function ProductCard({ product }) {
       <Link href={`/products/${product.id}`} className="card-img">
         <ProductImage product={product} />
         {onSale && <span className="badge">Sale</span>}
+        {product.youtubeUrl && (
+          <span className="badge-video" title="Has a video">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+            Video
+          </span>
+        )}
       </Link>
       <div className="card-brand">{product.brand}</div>
       <h3 className="card-name">

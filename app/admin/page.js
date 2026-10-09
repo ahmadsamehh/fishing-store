@@ -5,8 +5,9 @@ import { useStore, formatPrice } from '@/lib/store';
 import AdminGate from '@/components/AdminGate';
 import { CATEGORIES, subsOf } from '@/lib/catalog';
 import ProductImage from '@/components/ProductImage';
+import { youtubeId } from '@/lib/youtube';
 
-const EMPTY = { name: '', brand: '', category: CATEGORIES[0], subcategory: '', price: '', salePrice: '', stock: '', featured: false, image: '', description: '' };
+const EMPTY = { name: '', brand: '', category: CATEGORIES[0], subcategory: '', price: '', salePrice: '', stock: '', featured: false, image: '', description: '', youtubeUrl: '' };
 
 // Shrinks a photo before upload so pages stay fast.
 function resizeImage(file, max = 1200) {
@@ -53,6 +54,7 @@ function ProductForm({ initial, onSave, onCancel }) {
   const submit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return setError('Add a product name.');
+    if (form.youtubeUrl && form.youtubeUrl.trim() && !youtubeId(form.youtubeUrl)) return setError('That YouTube link was not recognized. Copy the link from the video page or the Share button.');
     if (!(Number(form.price) > 0)) return setError('Add a price greater than 0.');
     if (form.salePrice !== '' && Number(form.salePrice) >= Number(form.price)) return setError('The sale price must be lower than the regular price.');
     setBusy(true);
@@ -100,6 +102,10 @@ function ProductForm({ initial, onSave, onCancel }) {
           <label>Stock quantity<input type="number" min="0" value={form.stock} onChange={set('stock')} /></label>
           <label className="check"><input type="checkbox" checked={form.featured} onChange={set('featured')} />Show in best sellers on the homepage</label>
           <label className="full">Description<textarea rows="4" value={form.description} onChange={set('description')} /></label>
+          <label className="full">YouTube video link (optional)
+            <input type="url" inputMode="url" placeholder="https://www.youtube.com/watch?v=…" value={form.youtubeUrl || ''} onChange={set('youtubeUrl')} />
+            <small className="muted">Shows as a swipeable video next to the product photo.</small>
+          </label>
           <div className="full image-field">
             <div className="image-preview"><ProductImage product={preview} /></div>
             <div>

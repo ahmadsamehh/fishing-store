@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useStore, formatPrice, finalPrice } from '@/lib/store';
-import ProductImage from '@/components/ProductImage';
+import ProductMedia from '@/components/ProductMedia';
 import { WHATSAPP_NUMBER } from '@/lib/config';
 import QtyInput from '@/components/QtyInput';
 import { categoryHref } from '@/lib/catalog';
@@ -48,7 +48,7 @@ export default function ProductPage() {
         <span>{product.name}</span>
       </nav>
       <div className="pdp">
-        <div className="pdp-img"><ProductImage product={product} /></div>
+        <ProductMedia product={product} />
         <div className="pdp-info">
           <div className="card-brand">{product.brand}</div>
           <h1>{product.name}</h1>
