@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useStore, formatPrice } from '@/lib/store';
-import AdminGate, { AdminBar } from '@/components/AdminGate';
+import AdminGate from '@/components/AdminGate';
 import { CATEGORIES, subsOf } from '@/lib/catalog';
 import ProductImage from '@/components/ProductImage';
 
@@ -160,8 +160,7 @@ function Panel() {
   };
 
   return (
-    <div className="wrap section admin">
-      <AdminBar />
+    <div className="adm-page">
       <div className="section-head">
         <h1>Products</h1>
         <button className="btn btn-dark" onClick={() => setEditing({})}>Add product</button>

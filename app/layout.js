@@ -1,8 +1,7 @@
 import './globals.css';
 import { IBM_Plex_Sans, Readex_Pro } from 'next/font/google';
 import { StoreProvider } from '@/lib/store';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import SiteChrome from '@/components/SiteChrome';
 
 const body = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-body' });
 const display = Readex_Pro({ subsets: ['latin'], weight: ['500', '600', '700'], variable: '--font-display' });
@@ -17,9 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${body.variable} ${display.variable}`}>
       <body>
         <StoreProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
         </StoreProvider>
       </body>
     </html>

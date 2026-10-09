@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useStore, formatPrice } from '@/lib/store';
 import { STATUSES, STATUS_LABELS, formatOrderDate, waNumber } from '@/lib/orders';
-import AdminGate, { AdminBar } from '@/components/AdminGate';
+import AdminGate from '@/components/AdminGate';
 
 function OrderCard({ order, onUpdated }) {
   const { adminUpdateOrderStatus } = useStore();
@@ -131,8 +131,7 @@ function OrdersPanel() {
   });
 
   return (
-    <div className="wrap section admin">
-      <AdminBar />
+    <div className="adm-page">
       <div className="section-head">
         <h1>Orders</h1>
         <button className="btn btn-outline" onClick={load}>Refresh</button>

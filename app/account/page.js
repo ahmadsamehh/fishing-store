@@ -163,7 +163,7 @@ function Orders() {
 }
 
 function Profile() {
-  const { session, loadProfile, saveProfile, signOut, isAdmin } = useStore();
+  const { session, loadProfile, saveProfile, signOut } = useStore();
   const [p, setP] = useState(null);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
@@ -192,7 +192,6 @@ function Profile() {
           <p className="muted">{session.user.email}</p>
         </div>
         <div className="row-gap">
-          {isAdmin && <Link href="/admin" className="btn btn-outline">Store admin</Link>}
           <button className="btn btn-outline" onClick={signOut}>Sign out</button>
         </div>
       </div>

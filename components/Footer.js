@@ -25,7 +25,7 @@ export default function Footer() {
           </div>
         ))}
       </div>
-      <div className="footer-bottom">© 2026 Marjan. All rights reserved. <Link href="/admin">Store admin</Link></div>
+      <div className="footer-bottom">© 2026 Marjan. All rights reserved.</div>
     </footer>
   );
 }

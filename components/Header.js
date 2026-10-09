@@ -7,7 +7,7 @@ import { SearchIcon, UserIcon, CartIcon, Logo } from './Icons';
 import MegaMenu from './MegaMenu';
 
 export default function Header() {
-  const { cartCount, session, isAdmin } = useStore();
+  const { cartCount, session } = useStore();
   const router = useRouter();
   const [q, setQ] = useState('');
   const name = session?.user?.user_metadata?.full_name?.split(' ')[0];
@@ -34,7 +34,6 @@ export default function Header() {
           <button type="submit" aria-label="Search"><SearchIcon /></button>
         </form>
         <nav className="header-actions" aria-label="Account">
-          {isAdmin && <Link href="/admin" className="icon-link admin-link">Store admin</Link>}
           <Link href="/account" className="icon-link"><UserIcon /><span>{session ? (name ? `Hi, ${name}` : 'My account') : 'Sign in'}</span></Link>
           <Link href="/cart" className="cart-link" aria-label={`Cart, ${cartCount} items`}><CartIcon /><span>Cart</span><span className="count">{cartCount}</span></Link>
         </nav>
