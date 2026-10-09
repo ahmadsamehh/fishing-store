@@ -8,7 +8,7 @@ export default function ProductCard({ product }) {
   const onSale = product.salePrice && product.salePrice < product.price;
   const soldOut = Number(product.stock) <= 0;
   return (
-    <article className="card">
+    <article className="card reveal">
       <Link href={`/products/${product.id}`} className="card-img">
         <ProductImage product={product} />
         {onSale && <span className="badge">Sale</span>}

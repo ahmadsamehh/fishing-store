@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useStore } from '@/lib/store';
 import { SearchIcon, UserIcon, CartIcon, Logo } from './Icons';
 import MegaMenu from './MegaMenu';
@@ -11,6 +11,19 @@ export default function Header() {
   const router = useRouter();
   const [q, setQ] = useState('');
   const name = session?.user?.user_metadata?.full_name?.split(' ')[0];
+
+  // Little bounce on the cart count when something is added.
+  const [bump, setBump] = useState(false);
+  const prev = useRef(cartCount);
+  useEffect(() => {
+    if (cartCount > prev.current) {
+      setBump(true);
+      const t = setTimeout(() => setBump(false), 450);
+      prev.current = cartCount;
+      return () => clearTimeout(t);
+    }
+    prev.current = cartCount;
+  }, [cartCount]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -35,7 +48,7 @@ export default function Header() {
         </form>
         <nav className="header-actions" aria-label="Account">
           <Link href="/account" className="icon-link"><UserIcon /><span>{session ? (name ? `Hi, ${name}` : 'My account') : 'Sign in'}</span></Link>
-          <Link href="/cart" className="cart-link" aria-label={`Cart, ${cartCount} items`}><CartIcon /><span>Cart</span><span className="count">{cartCount}</span></Link>
+          <Link href="/cart" className="cart-link" aria-label={`Cart, ${cartCount} items`}><CartIcon /><span>Cart</span><span className={`count${bump ? ' bump' : ''}`}>{cartCount}</span></Link>
         </nav>
       </div>
     </header>

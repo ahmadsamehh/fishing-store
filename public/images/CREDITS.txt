@@ -1,0 +1,10 @@
+Placeholder photos from Wikimedia Commons, all public domain or CC0 (free to use, no attribution required).
+Replace them with the store's own photos when available (keep the same file names).
+
+hero-reef-tank.jpg     "Black storm Clownfish among coral.jpg" (CC0)
+cat-aquariums.jpg      "Large aquarium in the Coral Reef habitat in the Florida Aquarium in Tampa (01).jpg" (CC0)
+cat-lighting.jpg       "Acropora coral ffs.jpg" (Public domain)
+cat-livestock.jpg      "False Clownfish 1a.jpg" (CC0)
+cat-additives.jpg      "Stony coral growing in marine aquarium kept by Neil Skene Australia.JPG" (Public domain)
+cat-filtration.jpg     "Reef1995 - Flickr - NOAA Photo Library.jpg" (Public domain)
+feature-clownfish.jpg  "Clownfish feeding.jpg" (CC0)
