@@ -72,8 +72,10 @@ export default function CheckoutPage() {
 
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
     // Open WhatsApp right away (phones block pop-ups that open after a delay).
-    const win = window.open(url, '_blank', 'noopener');
-    if (!win) window.location.href = url;
+    // Note: passing 'noopener' makes window.open return null, which made the old code
+    // think the pop-up was blocked and send this tab to WhatsApp instead.
+    const win = window.open(url, '_blank');
+    if (win) win.opener = null;
     setSentUrl(url);
     setSentCode(code);
 

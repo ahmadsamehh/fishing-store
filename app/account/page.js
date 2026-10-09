@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore, formatPrice } from '@/lib/store';
 import { WHATSAPP_NUMBER } from '@/lib/config';
+import { STATUS_LABELS, PROGRESS, formatOrderDate } from '@/lib/orders';
 import { supabaseConfigured } from '@/lib/supabase';
 import { GOVERNORATES, isValidPhone } from '@/lib/egypt';
 
@@ -73,12 +74,25 @@ function SignUpForm({ onDone }) {
   );
 }
 
-const STATUS_LABELS = {
-  sent: 'Sent on WhatsApp',
-  confirmed: 'Confirmed',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
-};
+function Tracker({ status, updatedAt }) {
+  if (status === 'cancelled') {
+    return <p className="error tracker-cancel">This order was cancelled. Contact us on WhatsApp if you have questions.</p>;
+  }
+  const current = PROGRESS.indexOf(status);
+  return (
+    <div className="tracker-wrap">
+      <ol className="tracker" aria-label="Order progress">
+        {PROGRESS.map((s, i) => (
+          <li key={s} className={i < current ? 'done' : i === current ? 'current' : ''} aria-current={i === current ? 'step' : undefined}>
+            <span className="dot" aria-hidden="true" />
+            <span>{STATUS_LABELS[s]}</span>
+          </li>
+        ))}
+      </ol>
+      {updatedAt && <p className="muted small">Updated {formatOrderDate(updatedAt, true)}</p>}
+    </div>
+  );
+}
 
 function Orders() {
   const { session, loadOrders, products, addManyToCart } = useStore();
@@ -88,7 +102,11 @@ function Orders() {
   const [note, setNote] = useState('');
 
   useEffect(() => {
-    loadOrders().then(setOrders).catch((err) => { setError(err.message); setOrders([]); });
+    const load = () => loadOrders().then((d) => { setOrders(d); setError(''); }).catch((err) => { setError(err.message); setOrders((cur) => cur || []); });
+    load();
+    // Pick up status changes from the store when the customer comes back to this tab.
+    window.addEventListener('focus', load);
+    return () => window.removeEventListener('focus', load);
   }, [session?.user?.id]);
 
   const orderAgain = (order) => {
@@ -120,10 +138,11 @@ function Orders() {
         <details key={o.id} className="order">
           <summary>
             <span className="order-code">#{o.code}</span>
-            <span className="muted">{new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="muted">{formatOrderDate(o.created_at)}</span>
             <span className={`pill pill-${o.status}`}>{STATUS_LABELS[o.status] || o.status}</span>
             <strong className="order-total">{formatPrice(o.subtotal)}</strong>
           </summary>
+          <Tracker status={o.status} updatedAt={o.status_updated_at} />
           <ul className="order-items">
             {o.items.map((it) => (
               <li key={it.id}>

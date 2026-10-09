@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useStore, formatPrice } from '@/lib/store';
-import { supabaseConfigured } from '@/lib/supabase';
+import AdminGate, { AdminBar } from '@/components/AdminGate';
 import { CATEGORIES, subsOf } from '@/lib/catalog';
 import ProductImage from '@/components/ProductImage';
 
@@ -28,34 +28,6 @@ function resizeImage(file, max = 1200) {
     };
     img.src = url;
   });
-}
-
-function SignIn() {
-  const { adminSignIn: signIn } = useStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  const submit = async (e) => {
-    e.preventDefault();
-    setBusy(true);
-    setError(await signIn(email.trim(), password));
-    setBusy(false);
-  };
-
-  return (
-    <div className="wrap section">
-      <form className="login" onSubmit={submit}>
-        <h1>Store admin</h1>
-        <p className="muted">Sign in to add and edit products.</p>
-        <label>Email<input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
-        <label>Password<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
-        {error && <p className="error">{error}</p>}
-        <button className="btn btn-dark" type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-      </form>
-    </div>
-  );
 }
 
 function ProductForm({ initial, onSave, onCancel }) {
@@ -154,7 +126,7 @@ function ProductForm({ initial, onSave, onCancel }) {
 }
 
 function Panel() {
-  const { products, ready, loadError, addProduct, updateProduct, deleteProduct, removeImage, adminSession: session, adminSignOut: signOut } = useStore();
+  const { products, ready, loadError, addProduct, updateProduct, deleteProduct, removeImage } = useStore();
   const [editing, setEditing] = useState(null);
   const [q, setQ] = useState('');
   const [message, setMessage] = useState('');
@@ -189,10 +161,7 @@ function Panel() {
 
   return (
     <div className="wrap section admin">
-      <div className="admin-bar">
-        <span className="muted">Signed in as {session.user.email}</span>
-        <button className="link-btn" onClick={signOut}>Sign out</button>
-      </div>
+      <AdminBar />
       <div className="section-head">
         <h1>Products</h1>
         <button className="btn btn-dark" onClick={() => setEditing({})}>Add product</button>
@@ -242,26 +211,9 @@ function Panel() {
 }
 
 export default function AdminPage() {
-  const { adminSession: session, isAdmin, adminReady: authReady, adminSignOut: signOut } = useStore();
-
-  if (!supabaseConfigured) {
-    return (
-      <div className="wrap section">
-        <h1>Store admin</h1>
-        <p className="error">The database keys are missing. Add them in the hosting settings, then redeploy.</p>
-      </div>
-    );
-  }
-  if (!authReady) return <div className="wrap section">Loading…</div>;
-  if (!session) return <SignIn />;
-  if (!isAdmin) {
-    return (
-      <div className="wrap section">
-        <h1>Store admin</h1>
-        <p className="muted">This account ({session.user.email}) does not have admin access.</p>
-        <button className="btn btn-outline" onClick={signOut}>Sign out</button>
-      </div>
-    );
-  }
-  return <Panel />;
+  return (
+    <AdminGate>
+      <Panel />
+    </AdminGate>
+  );
 }
