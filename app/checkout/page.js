@@ -6,13 +6,15 @@ import { WHATSAPP_NUMBER } from '@/lib/config';
 import { GOVERNORATES, isValidPhone } from '@/lib/egypt';
 
 export default function CheckoutPage() {
-  const { cart, products, ready, session, loadProfile, saveProfile, clearCart } = useStore();
+  const { cart, products, ready, session, loadProfile, saveProfile, clearCart, placeOrder } = useStore();
   const [f, setF] = useState({ fullName: '', phone: '', city: '', address: '', notes: '' });
   const [location, setLocation] = useState('');
   const [locStatus, setLocStatus] = useState('');
   const [save, setSave] = useState(true);
   const [error, setError] = useState('');
   const [sentUrl, setSentUrl] = useState('');
+  const [sentCode, setSentCode] = useState('');
+  const [saveError, setSaveError] = useState('');
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
 
   // Fill in saved details for signed-in customers.
@@ -46,12 +48,15 @@ export default function CheckoutPage() {
     setError('');
 
     const origin = window.location.origin;
+    // Short reference the store owner can use when replying, e.g. M7K3Q9X2
+    const code = 'M' + Date.now().toString(36).toUpperCase().slice(-5) + Math.random().toString(36).slice(2, 4).toUpperCase();
     const items = lines.map((l, i) => {
       const price = finalPrice(l.product);
       return `${i + 1}) ${l.product.name}\n   ${l.qty} × ${formatPrice(price)} = ${formatPrice(price * l.qty)}\n   ${origin}/products/${l.id}`;
     });
     const msg = [
       'Hi, I want to buy these items:',
+      `Order #${code}`,
       '',
       ...items,
       '',
@@ -70,7 +75,31 @@ export default function CheckoutPage() {
     const win = window.open(url, '_blank', 'noopener');
     if (!win) window.location.href = url;
     setSentUrl(url);
-    if (session && save) saveProfile(f);
+    setSentCode(code);
+
+    // Save the order to the customer's history, then empty the cart.
+    if (session) {
+      placeOrder({
+        code,
+        items: lines.map((l) => ({
+          id: l.id,
+          name: l.product.name,
+          qty: l.qty,
+          price: finalPrice(l.product),
+          image: l.product.image || '',
+        })),
+        subtotal: total,
+        fullName: f.fullName.trim(),
+        phone: f.phone.trim(),
+        city: f.city,
+        address: f.address.trim(),
+        location,
+        notes: f.notes.trim(),
+        message: msg,
+      }).then(setSaveError);
+      if (save) saveProfile(f);
+    }
+    clearCart();
   };
 
   if (sentUrl) {
@@ -78,10 +107,16 @@ export default function CheckoutPage() {
       <div className="wrap section page-pad">
         <div className="auth-box">
           <h1>Your order is ready in WhatsApp</h1>
-          <p>Press send in WhatsApp to place your order. We will reply to confirm the total and delivery time.</p>
+          <p>Order <strong>#{sentCode}</strong>. Press send in WhatsApp to place it. We will reply to confirm the total and delivery time.</p>
+          <p className="muted">If WhatsApp did not open, or you closed it before sending, use the button below.</p>
+          {saveError && <p className="error">{saveError}</p>}
           <div className="row-gap">
             <a href={sentUrl} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp">Open WhatsApp again</a>
-            <Link href="/" className="btn btn-outline" onClick={clearCart}>Done, clear my cart</Link>
+            {session ? (
+              <Link href="/account#orders" className="btn btn-outline">View my orders</Link>
+            ) : (
+              <Link href="/" className="btn btn-outline">Continue shopping</Link>
+            )}
           </div>
         </div>
       </div>

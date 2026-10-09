@@ -2,7 +2,8 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useStore } from '@/lib/store';
+import { useStore, formatPrice } from '@/lib/store';
+import { WHATSAPP_NUMBER } from '@/lib/config';
 import { supabaseConfigured } from '@/lib/supabase';
 import { GOVERNORATES, isValidPhone } from '@/lib/egypt';
 
@@ -72,6 +73,76 @@ function SignUpForm({ onDone }) {
   );
 }
 
+const STATUS_LABELS = {
+  sent: 'Sent on WhatsApp',
+  confirmed: 'Confirmed',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
+
+function Orders() {
+  const { session, loadOrders, products, addManyToCart } = useStore();
+  const router = useRouter();
+  const [orders, setOrders] = useState(null);
+  const [error, setError] = useState('');
+  const [note, setNote] = useState('');
+
+  useEffect(() => {
+    loadOrders().then(setOrders).catch((err) => { setError(err.message); setOrders([]); });
+  }, [session?.user?.id]);
+
+  const orderAgain = (order) => {
+    const available = order.items.filter((it) => {
+      const p = products.find((x) => x.id === it.id);
+      return p && Number(p.stock) > 0;
+    });
+    if (!available.length) return setNote('None of the items in this order are available right now.');
+    addManyToCart(available);
+    const missing = order.items.length - available.length;
+    if (missing) setNote(`${missing} item(s) from this order are no longer available, so they were not added.`);
+    router.push('/cart');
+  };
+
+  const resend = (order) => {
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(order.message)}`, '_blank', 'noopener');
+  };
+
+  return (
+    <section id="orders" className="orders">
+      <h2>My orders</h2>
+      {error && <p className="error">{error}</p>}
+      {note && <p className="notice">{note}</p>}
+      {orders === null && <p className="muted">Loading your orders…</p>}
+      {orders && !orders.length && !error && (
+        <div className="empty">You have not placed any orders yet. <Link href="/products">Start shopping</Link></div>
+      )}
+      {orders && orders.map((o) => (
+        <details key={o.id} className="order">
+          <summary>
+            <span className="order-code">#{o.code}</span>
+            <span className="muted">{new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className={`pill pill-${o.status}`}>{STATUS_LABELS[o.status] || o.status}</span>
+            <strong className="order-total">{formatPrice(o.subtotal)}</strong>
+          </summary>
+          <ul className="order-items">
+            {o.items.map((it) => (
+              <li key={it.id}>
+                <span>{it.qty} × {products.some((p) => p.id === it.id) ? <Link href={`/products/${it.id}`}>{it.name}</Link> : it.name}</span>
+                <span>{formatPrice(it.price * it.qty)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="muted order-addr">Delivery to {[o.city, o.address].filter(Boolean).join(', ')}</p>
+          <div className="row-gap">
+            <button className="btn btn-dark btn-sm" onClick={() => orderAgain(o)}>Order again</button>
+            <button className="btn btn-outline btn-sm" onClick={() => resend(o)}>Send again on WhatsApp</button>
+          </div>
+        </details>
+      ))}
+    </section>
+  );
+}
+
 function Profile() {
   const { session, loadProfile, saveProfile, signOut, isAdmin } = useStore();
   const [p, setP] = useState(null);
@@ -122,6 +193,7 @@ function Profile() {
         {msg && <p className="notice">{msg}</p>}
         <button className="btn btn-dark" type="submit" disabled={busy}>{busy ? 'Saving…' : 'Save details'}</button>
       </form>
+      <Orders />
     </>
   );
 }
