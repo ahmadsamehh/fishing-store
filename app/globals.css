@@ -882,3 +882,36 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
 .ao-history strong { font-size: 14px; font-weight: 600; }
 .ao-history small { font-size: 13px; color: var(--muted); }
 @media (max-width: 760px) { .ao-status { grid-template-columns: minmax(0, 1fr); } }
+
+/* Category tiles with product cut-outs */
+.h-tile-prod { background: radial-gradient(circle at 72% 38%, #5E1470 0%, var(--purple) 52%, var(--ink) 100%); }
+.h-tile-prod::before { background: linear-gradient(90deg, rgba(30, 1, 35, .55) 0%, rgba(30, 1, 35, 0) 55%); }
+.h-tile-prod.h-tile-deals { background: radial-gradient(circle at 70% 35%, #FF3D84 0%, var(--coral) 45%, #A3003F 100%); }
+.h-tile-prod.h-tile-deals::before { display: block; background: linear-gradient(90deg, rgba(120, 0, 45, .45) 0%, rgba(120, 0, 45, 0) 55%); }
+.h-tile-prod.h-tile-all::before { display: block; }
+.h-tile-art { position: absolute; z-index: -1; right: 5%; top: 9%; bottom: 12%; width: 52%; display: flex; align-items: flex-end; justify-content: flex-end; pointer-events: none; }
+.h-tile.wide .h-tile-art { width: 50%; right: 8%; }
+.h-tile .h-tile-art img { position: relative; inset: auto; height: auto; max-height: 100%; object-fit: contain; object-position: bottom; z-index: auto; filter: drop-shadow(0 22px 26px rgba(0, 0, 0, .45)); transition: transform .6s var(--ease); }
+/* Widths depend on how many products a tile shows, so they always fit their area */
+.n-1 .s-lg { width: 78%; } .n-1 .s-md { width: 64%; } .n-1 .s-sm { width: 52%; }
+.n-2 img + img { margin-left: -14%; } .n-2 .s-lg { width: 62%; } .n-2 .s-md { width: 50%; } .n-2 .s-sm { width: 40%; }
+.n-3 img + img { margin-left: -12%; } .n-3 .s-lg { width: 50%; } .n-3 .s-md { width: 42%; } .n-3 .s-sm { width: 34%; }
+.h-tile:hover .h-tile-art img { transform: translateY(-8px) scale(1.04); }
+.h-tile:hover .h-tile-art img:nth-child(2) { transition-delay: .05s; }
+.h-tile:hover .h-tile-art img:nth-child(3) { transition-delay: .1s; }
+.h-tile-badge { position: absolute; top: 0; right: 0; padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .3); color: var(--white); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; backdrop-filter: blur(4px); }
+.h-tile-badge.pct { width: 74px; height: 74px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 34px; letter-spacing: 0; background: var(--white); color: var(--coral); border: 0; box-shadow: 0 12px 30px rgba(120, 0, 45, .35); }
+.h-tile-prod .h-tile-text { max-width: 48%; padding-right: 0; }
+.h-tile.wide.h-tile-prod .h-tile-text { max-width: 42%; }
+@media (max-width: 640px) {
+  .h-tile-art, .h-tile.wide .h-tile-art { top: 8%; bottom: auto; height: 60%; right: 5%; width: 62%; }
+  .h-tile-prod::before { background: linear-gradient(0deg, rgba(30, 1, 35, .75) 0%, rgba(30, 1, 35, 0) 55%); }
+  .h-tile-prod .h-tile-text, .h-tile.wide.h-tile-prod .h-tile-text { max-width: none; padding-right: 60px; }
+  .h-tile-badge.pct { width: 56px; height: 56px; font-size: 26px; }
+}
+.h-tile:not(.wide) .h-tile-art { top: 7%; bottom: 25%; }
+.h-tile-prod:not(.wide) .h-tile-text { max-width: 44%; }
+@media (max-width: 640px) {
+  .h-tile:not(.wide) .h-tile-art, .h-tile.wide .h-tile-art { top: 8%; bottom: auto; height: 56%; }
+  .h-tile-prod:not(.wide) .h-tile-text { max-width: none; }
+}

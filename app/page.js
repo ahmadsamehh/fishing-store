@@ -14,16 +14,30 @@ const perks = [
   { title: 'Reef experts', sub: 'Ask us before you buy', icon: perkIcons.experts },
 ];
 
-// Big photo tiles. "wide" tiles take two columns on large screens.
+// Category tiles: each shows real products from that category.
+// art = product cut-outs in /public/tiles, size lg | md | sm.
+const T = (name, size = 'lg') => ({ src: `/tiles/${name}.webp`, size });
 const tiles = [
-  { category: 'Heating & Cooling', text: 'TECO chillers that keep your reef at a steady temperature, even through an Egyptian summer.', img: '/images/cat-aquariums.jpg', wide: true },
-  { category: 'Pumps & Powerheads', text: 'Sicce Multi return pumps, made in Italy.', img: '/images/cat-filtration.jpg' },
-  { category: 'Salt & Additives', text: 'Aquaforest Reef Salt and Hybrid Pro Salt in 22 kg buckets.', img: '/images/cat-additives.jpg' },
-  { category: 'Filtration', text: 'Solid filters in every size for clear, clean water.', img: '/images/cat-lighting.jpg' },
-  { category: 'Used', text: 'Pre-owned equipment at lower prices. New items added regularly.', img: '/images/cat-livestock.jpg' },
-  { deals: true, title: 'Deals', text: 'Discounts on selected products. Updated every week.', wide: true },
-  { all: true, title: 'All products', text: 'Browse the full range, filter by category and sort by price.' },
+  { category: 'Heating & Cooling', text: 'TECO chillers that keep your reef at a steady temperature, even through an Egyptian summer.', wide: true,
+    art: [T('chiller-tk150', 'sm'), T('chiller-tk500', 'md'), T('chiller-tk1000', 'lg')] },
+  { category: 'Pumps & Powerheads', text: 'Sicce Multi return pumps, made in Italy.', art: [T('pump-800')] },
+  { category: 'Salt & Additives', text: 'Aquaforest Reef Salt and Hybrid Pro Salt in 22 kg buckets.', art: [T('salt-hybrid', 'md'), T('salt-reef', 'lg')] },
+  { category: 'Filtration', text: 'Solid filters in every size for clear, clean water.', art: [T('filters')] },
+  { category: 'Used', text: 'Pre-owned equipment at lower prices. New items added regularly.', badge: 'Pre-owned', art: [T('chiller-tk150', 'md')] },
+  { deals: true, title: 'Deals', text: 'Discounts on selected products. Updated every week.', wide: true, badge: '%',
+    art: [T('pump-800', 'sm'), T('salt-reef', 'md'), T('chiller-tk500', 'lg')] },
+  { all: true, title: 'All products', text: 'Browse the full range, filter by category and sort by price.',
+    art: [T('salt-hybrid', 'sm'), T('chiller-tk1000', 'lg'), T('pump-800', 'sm')] },
 ];
+
+function TileArt({ art, badge }) {
+  return (
+    <span className={`h-tile-art n-${art.length}`} aria-hidden="true">
+      {art.map((a, i) => (<img key={i} src={a.src} alt="" loading="lazy" className={`s-${a.size}`} />))}
+      {badge && <span className={`h-tile-badge${badge === '%' ? ' pct' : ''}`}>{badge}</span>}
+    </span>
+  );
+}
 
 const guides = [
   { tag: 'Beginners', title: 'How to start your first saltwater tank, step by step', text: 'Choosing a tank, cycling it, and adding your first fish without the common mistakes.' },
@@ -104,7 +118,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Category photo tiles */}
+      {/* 3. Category tiles with product images */}
       <section id="categories" className="wrap h-section">
         <div className="h-head reveal">
           <h2>Shop by <strong>category</strong></h2>
@@ -112,7 +126,8 @@ export default function Home() {
         </div>
         <div className="h-tiles">
           {tiles.map((t) => t.deals || t.all ? (
-            <Link key={t.title} href={t.deals ? '/products?sale=1' : '/products'} className={`h-tile reveal ${t.deals ? 'h-tile-deals' : 'h-tile-all'}${t.wide ? ' wide' : ''}`}>
+            <Link key={t.title} href={t.deals ? '/products?sale=1' : '/products'} className={`h-tile h-tile-prod reveal ${t.deals ? 'h-tile-deals' : 'h-tile-all'}${t.wide ? ' wide' : ''}`}>
+              <TileArt art={t.art} badge={t.badge} />
               <span className="h-tile-text">
                 <h3>{t.title}</h3>
                 <p>{t.text}</p>
@@ -120,8 +135,8 @@ export default function Home() {
               <span className="h-tile-arrow"><Arrow /></span>
             </Link>
           ) : (
-            <Link key={t.category} href={categoryHref(t.category)} className={`h-tile reveal${t.wide ? ' wide' : ''}`}>
-              <img src={t.img} alt="" loading="lazy" />
+            <Link key={t.category} href={categoryHref(t.category)} className={`h-tile h-tile-prod reveal${t.wide ? ' wide' : ''}`}>
+              <TileArt art={t.art} badge={t.badge} />
               <span className="h-tile-text">
                 <h3>{t.category}</h3>
                 <p>{t.text}</p>
