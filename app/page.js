@@ -16,18 +16,18 @@ const perks = [
 
 // Big photo tiles. "wide" tiles take two columns on large screens.
 const tiles = [
-  { category: 'Aquariums & Stands', text: 'Nano, all-in-one and reef-ready tanks, plus stands built to carry them.', img: '/images/cat-aquariums.jpg', wide: true },
-  { category: 'Lighting', text: 'LED fixtures and controllers for colourful, healthy corals.', img: '/images/cat-lighting.jpg' },
-  { category: 'Live Fish & Coral', text: 'Healthy fish, corals and invertebrates for your reef.', img: '/images/cat-livestock.jpg' },
-  { category: 'Salt & Additives', text: 'Salt mixes, calcium, alkalinity and trace elements.', img: '/images/cat-additives.jpg' },
-  { category: 'Filtration', text: 'Skimmers, sumps, filter socks and reactors.', img: '/images/cat-filtration.jpg' },
+  { category: 'Heating & Cooling', text: 'TECO chillers that keep your reef at a steady temperature, even through an Egyptian summer.', img: '/images/cat-aquariums.jpg', wide: true },
+  { category: 'Pumps & Powerheads', text: 'Sicce Multi return pumps, made in Italy.', img: '/images/cat-filtration.jpg' },
+  { category: 'Salt & Additives', text: 'Aquaforest Reef Salt and Hybrid Pro Salt in 22 kg buckets.', img: '/images/cat-additives.jpg' },
+  { category: 'Filtration', text: 'Solid filters in every size for clear, clean water.', img: '/images/cat-lighting.jpg' },
+  { category: 'Used', text: 'Pre-owned equipment at lower prices. New items added regularly.', img: '/images/cat-livestock.jpg' },
   { deals: true, title: 'Deals', text: 'Discounts on selected products. Updated every week.', wide: true },
   { all: true, title: 'All products', text: 'Browse the full range, filter by category and sort by price.' },
 ];
 
 const guides = [
   { tag: 'Beginners', title: 'How to start your first saltwater tank, step by step', text: 'Choosing a tank, cycling it, and adding your first fish without the common mistakes.' },
-  { tag: 'Lighting', title: 'Choosing the right reef light for your tank', text: 'What PAR, spectrum and coverage mean, and how much light your corals really need.' },
+  { tag: 'Chillers', title: 'Do you need a chiller for your reef?', text: 'How summer heat affects corals, and how to choose the right chiller size for your tank.' },
   { tag: 'Water quality', title: 'Getting salinity and water tests right', text: 'Which parameters to test, how often, and what to do when a number is off.' },
 ];
 
@@ -82,7 +82,7 @@ export default function Home() {
         <img className="h-hero-bg" src="/images/hero-reef-tank.jpg" alt="" />
         <div className="wrap h-hero-inner">
           <h1>Built for <strong>reefers</strong>.<br />Delivered across <strong>Egypt</strong>.</h1>
-          <p>Lighting, pumps, filtration, salt and supplements, with advice from people who actually keep reefs.</p>
+          <p>Chillers, pumps, filtration and salt from trusted brands, with advice from people who actually keep reefs.</p>
           <div className="h-hero-cta">
             <Link href="/products" className="btn btn-pink">Shop all products</Link>
             <a href="#categories" className="btn btn-ghost">Browse categories</a>

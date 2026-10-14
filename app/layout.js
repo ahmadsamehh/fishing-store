@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '
 
 export const metadata = {
   title: 'Marjan — Reef aquarium supplies',
-  description: 'Lighting, pumps, filtration, salt and supplements for reef aquariums.',
+  description: 'Chillers, pumps, filtration and salt for reef aquariums, delivered across Egypt.',
 };
 
 export default function RootLayout({ children }) {
