@@ -1,3 +1,6 @@
+-- NOTE: historical. Product photos have since moved to Supabase Storage and the
+-- /products/... files were removed from the project. Do not run this again as-is.
+
 -- Marjan: replace all products with the real catalogue (18 products).
 -- Past orders are NOT affected: each order keeps its own copy of the items, names and prices.
 

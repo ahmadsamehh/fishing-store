@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { CATALOG, categoryHref } from '@/lib/catalog';
+import { categoryHref } from '@/lib/catalog';
+import { useCatalog } from '@/lib/useCatalog';
 import { useStore } from '@/lib/store';
 import { WHATSAPP_NUMBER } from '@/lib/config';
 import ProductImage from './ProductImage';
@@ -38,6 +39,7 @@ export default function MegaMenu() {
   const params = useSearchParams();
   const ref = useRef(null);
   const { products } = useStore();
+  const { catalog: CATALOG } = useCatalog();
 
   // Close whenever the page changes.
   useEffect(() => setOpen(false), [pathname, params]);
@@ -57,7 +59,7 @@ export default function MegaMenu() {
     };
   }, [open]);
 
-  const cat = CATALOG[active];
+  const cat = CATALOG.at(active) || CATALOG.at(0) || { name: '', subs: [] };
   const pick = products.find((p) => p.category === cat.name && p.image) || products.find((p) => p.category === cat.name);
 
   return (

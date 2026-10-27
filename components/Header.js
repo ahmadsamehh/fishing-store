@@ -32,7 +32,7 @@ export default function Header() {
 
   return (
     <header className="site-header">
-      <div className="topbar">Free shipping on orders over EGP [AMOUNT] · Delivery across Egypt</div>
+      <div className="topbar">Delivery across Egypt · Order easily on WhatsApp</div>
       <div className="wrap header-main">
         <Link href="/" className="brand">
           <span className="brand-mark"><Logo /></span>

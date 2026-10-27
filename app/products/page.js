@@ -2,13 +2,14 @@
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useStore, finalPrice } from '@/lib/store';
-import { CATEGORIES, subsOf } from '@/lib/catalog';
+import { useCatalog } from '@/lib/useCatalog';
 import ProductCard from '@/components/ProductCard';
 
 function Listing() {
   const params = useSearchParams();
   const router = useRouter();
   const { products, ready, loadError } = useStore();
+  const { categories: CATEGORIES, subsOf } = useCatalog();
   const q = (params.get('q') || '').toLowerCase();
   const category = params.get('category') || '';
   const sub = params.get('sub') || '';

@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import ProductImage from './ProductImage';
-import { youtubeId, youtubeThumb } from '@/lib/youtube';
+import { youtubeId } from '@/lib/youtube';
 
 // Swipeable gallery: photo first, then the product video (if it has one).
 // The video starts playing (muted, as browsers require) when its slide is on screen,
@@ -32,7 +32,7 @@ export default function ProductMedia({ product }) {
     if (track) track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
   };
 
-  if (!videoId) return <div className="pdp-img"><ProductImage product={product} /></div>;
+  if (!videoId) return <div className="pdp-img"><ProductImage product={product} size="lg" eager /></div>;
 
   const src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1`;
 
@@ -40,7 +40,7 @@ export default function ProductMedia({ product }) {
     <div className="media">
       <div className="media-track" ref={trackRef} aria-label="Product photo and video">
         <div className="media-slide">
-          <ProductImage product={product} />
+          <ProductImage product={product} size="lg" eager />
         </div>
         <div className="media-slide media-video" ref={videoRef}>
           {videoVisible ? (
@@ -52,7 +52,8 @@ export default function ProductMedia({ product }) {
             />
           ) : (
             <button type="button" className="media-poster" onClick={() => goTo(1)} aria-label="Play video">
-              <img src={youtubeThumb(videoId)} alt="" loading="lazy" />
+              {product.image ? <img src={product.image} alt="" loading="lazy" decoding="async" /> : null}
+              <span className="media-poster-label">Watch the video</span>
               <span className="play" aria-hidden="true">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
               </span>

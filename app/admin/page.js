@@ -3,37 +3,20 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useStore, formatPrice } from '@/lib/store';
 import AdminGate from '@/components/AdminGate';
-import { CATEGORIES, subsOf } from '@/lib/catalog';
+import { useCatalog } from '@/lib/useCatalog';
+import { resizeToJpeg } from '@/lib/images';
 import ProductImage from '@/components/ProductImage';
 import { youtubeId } from '@/lib/youtube';
 
-const EMPTY = { name: '', brand: '', category: CATEGORIES[0], subcategory: '', price: '', salePrice: '', stock: '', featured: false, image: '', description: '', youtubeUrl: '' };
+const EMPTY = { name: '', brand: '', category: '', subcategory: '', price: '', salePrice: '', stock: '', featured: false, image: '', description: '', youtubeUrl: '' };
 
 // Shrinks a photo before upload so pages stay fast.
-function resizeImage(file, max = 1200) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onerror = () => reject(new Error('That file is not an image. Pick a JPG or PNG.'));
-    img.onload = () => {
-      const scale = Math.min(1, max / Math.max(img.width, img.height));
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(url);
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('The photo could not be prepared.'))), 'image/jpeg', 0.85);
-    };
-    img.src = url;
-  });
-}
+const resizeImage = (file) => resizeToJpeg(file, 1200);
 
 function ProductForm({ initial, onSave, onCancel }) {
   const { uploadImage } = useStore();
-  const [form, setForm] = useState({ ...EMPTY, ...initial, salePrice: initial?.salePrice ?? '' });
+  const { categories: CATEGORIES, subsOf } = useCatalog();
+  const [form, setForm] = useState({ ...EMPTY, category: CATEGORIES.at(0) || '', ...initial, salePrice: initial?.salePrice ?? '' });
   const [newPhoto, setNewPhoto] = useState(null); // { blob, preview }
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);

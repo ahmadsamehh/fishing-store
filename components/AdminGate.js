@@ -66,6 +66,11 @@ const NAV = [
     label: 'Products',
     icon: 'M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8',
   },
+  {
+    href: '/admin/categories',
+    label: 'Categories',
+    icon: 'M4 5h7v7H4zM13 5h7v7h-7zM4 14h7v6H4zM13 14h7v6h-7z',
+  },
 ];
 
 // Sidebar layout for every admin page.
