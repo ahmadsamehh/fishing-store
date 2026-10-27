@@ -179,8 +179,8 @@ function Panel() {
                   </div>
                 </td>
                 <td>{p.category}{p.subcategory && <span className="muted t-sub">{p.subcategory}</span>}</td>
-                <td>{p.salePrice ? (<><strong>{formatPrice(p.salePrice)}</strong> <s className="muted">{formatPrice(p.price)}</s></>) : formatPrice(p.price)}</td>
-                <td><span className={Number(p.stock) > 0 ? 'pill pill-ok' : 'pill pill-out'}>{Number(p.stock) > 0 ? p.stock : 'Out'}</span></td>
+                <td data-label="Price">{p.salePrice ? (<><strong>{formatPrice(p.salePrice)}</strong> <s className="muted">{formatPrice(p.price)}</s></>) : formatPrice(p.price)}</td>
+                <td data-label="Stock"><span className={Number(p.stock) > 0 ? 'pill pill-ok' : 'pill pill-out'}>{Number(p.stock) > 0 ? p.stock : 'Out'}</span></td>
                 <td className="t-actions">
                   <button className="btn btn-outline btn-sm" onClick={() => setEditing(p)}>Edit</button>
                   <button className="btn btn-danger btn-sm" onClick={() => remove(p)}>Delete</button>

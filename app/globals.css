@@ -991,3 +991,92 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
   .h-tile.span-2 { grid-column: span 2; }
   .h-tile.span-3 { grid-column: span 3; }
 }
+
+/* =========================================================
+   Admin dashboard on phones
+   ========================================================= */
+@media (max-width: 700px) {
+  /* Header: brand + account on one line, three equal tabs underneath */
+  .adm-side { padding: 10px 12px 12px; gap: 10px; }
+  .adm-nav { gap: 6px; }
+  .adm-nav a { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 3px; padding: 8px 4px; font-size: 12.5px; position: relative; }
+  .adm-nav a svg { width: 20px; height: 20px; }
+  .adm-badge { position: absolute; top: 4px; right: 8px; margin: 0; font-size: 11px; padding: 0 6px; }
+  .adm-page { padding: 18px 12px 40px; }
+  .adm-page .section-head { margin-bottom: 14px; align-items: center; }
+  .adm-page .section-head h1 { font-size: 26px; }
+
+  /* Counters: one compact row */
+  .adm-page .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .adm-page .stats div { padding: 12px 10px; border-radius: 12px; }
+  .adm-page .stats strong { font-size: 24px; }
+  .adm-page .stats span { font-size: 10.5px; letter-spacing: .04em; line-height: 1.3; }
+
+  /* Products: each product becomes a card instead of a wide table row */
+  .adm-page .table-wrap { border: 0; overflow: visible; background: none; }
+  .adm-page .table { min-width: 0; display: block; }
+  .adm-page .table thead { display: none; }
+  .adm-page .table tbody { display: flex; flex-direction: column; gap: 10px; }
+  .adm-page .table tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; align-items: center; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  .adm-page .table td { padding: 0; border: 0; }
+  .adm-page .table td:nth-child(1) { grid-column: 1 / -1; }
+  .adm-page .table td:nth-child(2) { grid-column: 1; grid-row: 2; font-size: 13px; color: var(--muted); }
+  .adm-page .table td:nth-child(2) .t-sub { display: inline; }
+  .adm-page .table td:nth-child(2) .t-sub::before { content: ' · '; }
+  .adm-page .table td:nth-child(4) { grid-column: 2; grid-row: 2; justify-self: end; }
+  .adm-page .table td:nth-child(3) { grid-column: 1; grid-row: 3; font-size: 15px; }
+  .adm-page .table td:nth-child(5) { grid-column: 2; grid-row: 3; }
+  .adm-page .table td[data-label="Stock"]::before { content: 'Stock '; font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .adm-page .t-thumb { width: 56px; }
+  .adm-page .t-actions { gap: 6px; }
+  .adm-page .t-actions .btn-sm { min-height: 40px; padding: 0 14px; }
+
+  /* Add / edit product: full-screen sheet with the buttons always reachable */
+  .modal-back { padding: 0; align-items: stretch; }
+  .modal { max-width: none; min-height: 100%; border-radius: 0; padding: 20px 16px 0; gap: 14px; }
+  .modal-actions { position: sticky; bottom: 0; margin: 0 -16px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--white); border-top: 1px solid var(--line); }
+  .modal-actions .btn { flex: 1; }
+
+  /* Orders: status filters in one row that scrolls sideways */
+  .adm-page .filter-tabs { flex-wrap: nowrap; overflow-x: auto; margin: 0 -12px 14px; padding: 0 12px 4px; scrollbar-width: none; }
+  .adm-page .filter-tabs::-webkit-scrollbar { display: none; }
+  .adm-page .filter-tabs button { flex: 0 0 auto; }
+  .adm-page .order { padding: 0 12px; }
+  .adm-page .order summary { gap: 6px 10px; }
+  .ao-status { padding: 14px 12px; }
+  .ao-status-row .btn { flex: 1 1 100%; }
+  .kv { grid-template-columns: 92px minmax(0, 1fr); }
+
+  /* Categories: keep a subcategory's buttons on the same line */
+  .cat-card { padding: 14px 12px; }
+  .cat-subs li { flex-wrap: nowrap; gap: 6px; }
+  .cat-subs li .cat-name { min-width: 0; flex: 1; }
+  .cat-subs li .cat-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cat-subs li > .muted { white-space: nowrap; font-size: 12px; }
+  .cat-head { gap: 10px; }
+
+  /* iPhone zooms the page when a field's text is under 16px: keep them at 16px */
+  .adm input, .adm select, .adm textarea, .modal input, .modal select, .modal textarea { font-size: 16px !important; }
+}
+
+/* Store on phones: products page and small touch fixes */
+@media (max-width: 640px) {
+  .listing { gap: 14px; padding-top: 18px; }
+  .filters { flex-direction: row; flex-wrap: nowrap; align-items: center; overflow-x: auto; gap: 6px; margin: 0 -16px; padding: 0 16px 6px; scrollbar-width: none; }
+  .filters::-webkit-scrollbar { display: none; }
+  .filters h2 { display: none; }
+  .filter { flex: 0 0 auto; white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; background: var(--white); }
+  .filter.on { border-color: var(--teal-soft); }
+  .filters .check { flex: 0 0 auto; margin: 0 0 0 4px; white-space: nowrap; }
+  .listing .section-head { margin-bottom: 6px; }
+  .grid-products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .card { padding: 10px; gap: 6px; border-radius: 12px; }
+  .card-name { font-size: 14px; min-height: 0; }
+  .card-brand { font-size: 12px; }
+  .card-price { flex-wrap: wrap; gap: 2px 6px; }
+  .card-price strong { font-size: 15px; }
+  .card-btn { min-height: 40px; padding: 0 10px; font-size: 13.5px; }
+  .badge, .badge-video { font-size: 11px; }
+}
+.sort select { font-size: 16px; }
+.auth-link { padding: 10px 0; }
