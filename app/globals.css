@@ -1080,3 +1080,58 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
 }
 .sort select { font-size: 16px; }
 .auth-link { padding: 10px 0; }
+
+/* Admin: account menu (Change password / Sign out) */
+.adm-user { position: relative; display: block; padding: 14px 0 0; }
+.adm-user-btn { width: 100%; display: flex; align-items: center; gap: 10px; background: none; border: 0; color: inherit; padding: 8px; border-radius: 10px; cursor: pointer; text-align: left; transition: background-color .2s ease; }
+.adm-user-btn:hover, .adm-user-btn[aria-expanded="true"] { background: var(--ink-2); }
+.adm-user-btn .adm-user-text { flex: 1; }
+.adm-chev { flex-shrink: 0; color: #D9C8DE; transition: transform .2s ease; }
+.adm-user-btn[aria-expanded="true"] .adm-chev { transform: rotate(180deg); }
+.adm-menu { position: absolute; left: 0; right: 0; bottom: calc(100% + 6px); z-index: 60; background: var(--white); border-radius: 12px; padding: 6px; box-shadow: 0 18px 40px rgba(0, 0, 0, .35); display: flex; flex-direction: column; animation: popIn .18s var(--ease) both; }
+.adm-menu button { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: 0; padding: 11px 12px; border-radius: 8px; color: var(--ink); font-weight: 500; font-size: 15px; cursor: pointer; text-align: left; }
+.adm-menu button:hover { background: var(--mist); }
+.adm-menu button:last-child { color: #B8004A; }
+.cp-modal { max-width: 420px; }
+.cp-form { display: flex; flex-direction: column; gap: 14px; }
+.cp-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; }
+.cp-form input { border: 1.5px solid var(--line); border-radius: 10px; padding: 0 12px; min-height: 46px; font-size: 16px; font-weight: 400; }
+.cp-form input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+.cp-form p { margin: 0; }
+@media (max-width: 860px) {
+  .adm-user { margin: 0 0 0 auto; padding: 0; }
+  .adm-user-btn { width: auto; padding: 4px 6px; }
+  .adm-menu { left: auto; right: 0; bottom: auto; top: calc(100% + 6px); min-width: 220px; }
+}
+@media (max-width: 700px) {
+  /* Full-screen form: solid background so the page behind never shows when scrolling */
+  .modal-back { background: var(--white); animation: none; }
+  .modal { box-shadow: none; }
+}
+
+/* Admin categories: collapsed cards that open on tap */
+.cat-card { gap: 0; padding: 6px 12px 6px 8px; transition: box-shadow .25s ease, border-color .25s ease; }
+.cat-card.open { box-shadow: 0 12px 30px rgba(30, 1, 35, .08); padding-bottom: 14px; }
+.cat-card.is-new { border-color: var(--coral); box-shadow: 0 0 0 3px var(--coral-soft); }
+.cat-head { flex-wrap: nowrap; gap: 6px; }
+.cat-order { flex-direction: column; }
+.cat-toggle { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 10px 4px; cursor: pointer; text-align: left; color: var(--ink); border-radius: 10px; }
+.cat-toggle:hover { background: var(--mist); }
+.cat-toggle-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cat-toggle-name { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cat-toggle-meta { font-size: 13px; }
+.cat-chev { flex-shrink: 0; color: var(--muted); transition: transform .25s var(--ease); }
+.cat-toggle[aria-expanded="true"] .cat-chev { transform: rotate(180deg); }
+.cat-new { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: var(--coral); color: var(--white); padding: 2px 8px; border-radius: 999px; }
+.cat-body { border-top: 1px solid var(--line); margin-top: 6px; padding: 12px 4px 0 4px; display: flex; flex-direction: column; gap: 12px; animation: fadeIn .25s ease both; }
+.cat-body-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.cat-body-acts { display: flex; align-items: center; gap: 12px; }
+.cat-del-note { margin: -4px 0 0; }
+.cat-subs { border-top: 0; padding-top: 0; }
+@media (max-width: 700px) {
+  .cat-card { padding: 4px 8px 4px 4px; }
+  .cat-card.open { padding-bottom: 12px; }
+  .cat-toggle-name { font-size: 16px; }
+}
+.cat-pos { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--mist); border-radius: 10px; padding: 6px 6px 6px 12px; font-size: 14px; }
+.cat-pos-acts { display: inline-flex; gap: 2px; }

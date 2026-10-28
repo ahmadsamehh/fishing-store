@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/lib/store';
@@ -73,9 +73,109 @@ const NAV = [
   },
 ];
 
+// Change-password window, opened from the account menu.
+function ChangePassword({ onClose }) {
+  const { adminChangePassword } = useStore();
+  const [current, setCurrent] = useState('');
+  const [pw, setPw] = useState('');
+  const [pw2, setPw2] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (pw.length < 8) return setError('Use at least 8 characters for the new password.');
+    if (pw !== pw2) return setError('The two new passwords do not match.');
+    if (pw === current) return setError('The new password must be different from the current one.');
+    setBusy(true);
+    setError('');
+    const err = await adminChangePassword(current, pw);
+    setBusy(false);
+    err ? setError(err) : setDone(true);
+  };
+
+  return (
+    <div className="modal-back" role="dialog" aria-modal="true" aria-labelledby="cp-title" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal cp-modal">
+        {done ? (
+          <>
+            <h2 id="cp-title">Password changed</h2>
+            <p className="muted">Use your new password next time you sign in.</p>
+            <div className="modal-actions"><button className="btn btn-pink" onClick={onClose}>Done</button></div>
+          </>
+        ) : (
+          <form onSubmit={submit} className="cp-form" noValidate>
+            <h2 id="cp-title">Change password</h2>
+            <label>Current password<input type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} required autoFocus /></label>
+            <label>New password<input type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} required /></label>
+            <label>New password again<input type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} required /></label>
+            <p className="muted small">At least 8 characters.</p>
+            {error && <p className="error" role="alert">{error}</p>}
+            <div className="modal-actions">
+              <button type="button" className="btn btn-outline" onClick={onClose} disabled={busy}>Cancel</button>
+              <button type="submit" className="btn btn-pink" disabled={busy}>{busy ? 'Saving…' : 'Change password'}</button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// The signed-in staff member: tap to open Change password / Sign out.
+function AccountMenu({ name, email, showEmail, initial }) {
+  const { adminSignOut } = useStore();
+  const [open, setOpen] = useState(false);
+  const [changing, setChanging] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('pointerdown', close);
+    window.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', close); window.removeEventListener('keydown', esc); };
+  }, [open]);
+
+  return (
+    <div className="adm-user" ref={ref}>
+      <button type="button" className="adm-user-btn" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <span className="adm-avatar" aria-hidden="true">{initial}</span>
+        <span className="adm-user-text">
+          <strong>{name}</strong>
+          {showEmail && <small>{email}</small>}
+        </span>
+        <svg className="adm-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        <span className="sr-only">Account menu</span>
+      </button>
+      {open && (
+        <div className="adm-menu" role="menu">
+          <button type="button" role="menuitem" onClick={() => { setOpen(false); setChanging(true); }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+            Change password
+          </button>
+          <button type="button" role="menuitem" onClick={adminSignOut}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3" /></svg>
+            Sign out
+          </button>
+        </div>
+      )}
+      {changing && <ChangePassword onClose={() => setChanging(false)} />}
+    </div>
+  );
+}
+
 // Sidebar layout for every admin page.
 function Shell({ children }) {
-  const { adminSession, adminName, adminSignOut, adminCountNewOrders } = useStore();
+  const { adminSession, adminName, adminCountNewOrders } = useStore();
   const path = usePathname();
   const [newCount, setNewCount] = useState(0);
 
@@ -106,14 +206,7 @@ function Shell({ children }) {
             );
           })}
         </nav>
-        <div className="adm-user">
-          <span className="adm-avatar" aria-hidden="true">{initial}</span>
-          <span className="adm-user-text">
-            <strong>{name}</strong>
-            {adminName && <small>{email}</small>}
-          </span>
-          <button className="adm-signout" onClick={adminSignOut}>Sign out</button>
-        </div>
+        <AccountMenu name={name} email={email} showEmail={Boolean(adminName)} initial={initial} />
       </aside>
       <main className="adm-main">{children}</main>
     </div>
