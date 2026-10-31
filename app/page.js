@@ -5,6 +5,7 @@ import { categoryHref } from '@/lib/catalog';
 import { useCatalog } from '@/lib/useCatalog';
 import { perkIcons } from '@/components/Icons';
 import ProductImage from '@/components/ProductImage';
+import HeroVideo from '@/components/HeroVideo';
 import { youtubeId } from '@/lib/youtube';
 import { thumbOf } from '@/lib/images';
 import { WHATSAPP_NUMBER, PLACEHOLDER_IMAGES } from '@/lib/config';
@@ -132,7 +133,7 @@ export default function Home() {
     <>
       {/* 1. Full-width photo hero */}
       <section className="h-hero">
-        <img className="h-hero-bg" src="/images/hero-reef-tank.jpg" alt="" />
+        <HeroVideo className="h-hero-bg" />
         <div className="wrap h-hero-inner">
           <h1>Built for <strong>reefers</strong>.<br />Delivered across <strong>Egypt</strong>.</h1>
           <p>Chillers, pumps, filtration and salt from trusted brands, with advice from people who actually keep reefs.</p>

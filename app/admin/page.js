@@ -5,6 +5,7 @@ import { useStore, formatPrice } from '@/lib/store';
 import AdminGate from '@/components/AdminGate';
 import { useCatalog } from '@/lib/useCatalog';
 import { resizeToJpeg } from '@/lib/images';
+import PhotoManager from '@/components/PhotoManager';
 import ProductImage from '@/components/ProductImage';
 import { youtubeId } from '@/lib/youtube';
 
@@ -17,22 +18,12 @@ function ProductForm({ initial, onSave, onCancel }) {
   const { uploadImage } = useStore();
   const { categories: CATEGORIES, subsOf } = useCatalog();
   const [form, setForm] = useState({ ...EMPTY, category: CATEGORIES.at(0) || '', ...initial, salePrice: initial?.salePrice ?? '' });
-  const [newPhoto, setNewPhoto] = useState(null); // { blob, preview }
+  const [photos, setPhotos] = useState(() => (initial?.images?.length ? initial.images : initial?.image ? [initial.image] : []).map((url) => ({ url })));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
 
-  const pickImage = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const blob = await resizeImage(file);
-      setNewPhoto({ blob, preview: URL.createObjectURL(blob) });
-      setError('');
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+
 
   const submit = async (e) => {
     e.preventDefault();
@@ -43,23 +34,27 @@ function ProductForm({ initial, onSave, onCancel }) {
     setBusy(true);
     setError('');
     try {
-      const image = newPhoto ? await uploadImage(newPhoto.blob) : form.image;
+      // Upload new photos (in order), keep the ones already uploaded.
+      const images = [];
+      for (const ph of photos) images.push(ph.url || (await uploadImage(ph.blob)));
+      const before = initial?.images?.length ? initial.images : initial?.image ? [initial.image] : [];
       await onSave({
         ...form,
-        image,
+        images,
+        image: images[0] || '',
         name: form.name.trim(),
         brand: form.brand.trim(),
         price: Number(form.price),
         salePrice: form.salePrice === '' ? null : Number(form.salePrice),
         stock: Number(form.stock) || 0,
-      }, initial?.image && image !== initial.image ? initial.image : null);
+      }, before.filter((u) => !images.includes(u)));
     } catch (err) {
       setError(err.message);
       setBusy(false);
     }
   };
 
-  const preview = { ...form, image: newPhoto ? newPhoto.preview : form.image };
+
 
   return (
     <div className="modal-back" role="dialog" aria-modal="true" aria-labelledby="form-title">
@@ -89,17 +84,8 @@ function ProductForm({ initial, onSave, onCancel }) {
             <input type="url" inputMode="url" placeholder="https://www.youtube.com/watch?v=…" value={form.youtubeUrl || ''} onChange={set('youtubeUrl')} />
             <small className="muted">Shows as a swipeable video next to the product photo.</small>
           </label>
-          <div className="full image-field">
-            <div className="image-preview"><ProductImage product={preview} /></div>
-            <div>
-              <label className="btn btn-outline">
-                {preview.image ? 'Change photo' : 'Upload photo'}
-                <input type="file" accept="image/*" onChange={pickImage} className="sr-only" />
-              </label>
-              {preview.image && (
-                <button type="button" className="link-btn" onClick={() => { setNewPhoto(null); setForm({ ...form, image: '' }); }}>Remove photo</button>
-              )}
-            </div>
+          <div className="full">
+            <PhotoManager photos={photos} onChange={setPhotos} onError={setError} />
           </div>
         </div>
         {error && <p className="error">{error}</p>}
@@ -124,7 +110,7 @@ function Panel() {
   const list = products.filter((p) => `${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q.toLowerCase()));
   const outOfStock = products.filter((p) => Number(p.stock) <= 0).length;
 
-  const save = async (data, oldImage) => {
+  const save = async (data, removedImages = []) => {
     if (editing?.id) {
       await updateProduct(editing.id, data);
       setMessage(`Saved changes to “${data.name}”.`);
@@ -132,7 +118,7 @@ function Panel() {
       await addProduct(data);
       setMessage(`Added “${data.name}”.`);
     }
-    if (oldImage) await removeImage(oldImage);
+    for (const url of removedImages) await removeImage(url);
     setError('');
     setEditing(null);
   };
