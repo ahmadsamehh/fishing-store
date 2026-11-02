@@ -1135,6 +1135,7 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
 }
 .cat-pos { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--mist); border-radius: 10px; padding: 6px 6px 6px 12px; font-size: 14px; }
 .cat-pos-acts { display: inline-flex; gap: 2px; }
+
 /* =========================================================
    Several photos per product
    ========================================================= */
@@ -1167,3 +1168,122 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
 .pm-add { border-style: dashed !important; background: var(--white) !important; }
 .pm-add label { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--teal); font-weight: 600; font-size: 13px; cursor: pointer; text-align: center; }
 .pm-add label:hover { background: var(--teal-soft); }
+
+/* =========================================================
+   Logo
+   ========================================================= */
+.brand-logo { display: block; height: 40px; width: auto; }
+.f-logo img { display: block; height: 40px; width: auto; }
+.adm-brand img { display: block; height: 30px; width: auto; }
+.adm-brand small { margin-left: 2px; }
+@media (max-width: 640px) {
+  .brand-logo { height: 32px; }
+  .adm-brand img { height: 26px; }
+}
+
+/* =========================================================
+   Shop by brand (moving strip)
+   ========================================================= */
+.h-brands { padding-bottom: 2px; }
+.bs { overflow: hidden; padding: 6px 0 14px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.bs-track { display: flex; gap: 16px; width: max-content; animation: bsSlide var(--bs-duration, 30s) linear infinite; }
+.bs:hover .bs-track, .bs:focus-within .bs-track, .bs:active .bs-track { animation-play-state: paused; }
+@keyframes bsSlide { to { transform: translateX(-50%); } }
+.bs-card { flex: 0 0 auto; display: flex; align-items: center; gap: 14px; width: 260px; padding: 24px 18px 10px 14px; background: var(--white); border: 1px solid var(--line); border-radius: 18px; transition: border-color .25s ease, box-shadow .25s ease, transform .3s var(--ease); }
+.bs-card:hover { border-color: transparent; box-shadow: 0 14px 30px rgba(30, 1, 35, .12); transform: translateY(-3px); color: var(--ink); }
+.bs-img { width: 64px; height: 100px; flex-shrink: 0; border-radius: 14px; background: var(--mist); overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; color: var(--teal); }
+.bs-img img { width: 100%; height: 100%; object-fit: contain; }
+.bs-text { display: flex; flex-direction: column; min-width: 0; }
+.bs-text strong { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-text small { color: var(--muted); font-size: 13px; }
+@media (prefers-reduced-motion: reduce) {
+  .bs { overflow-x: auto; }
+  .bs-track { animation: none; }
+}
+@media (max-width: 640px) { .bs-card { width: 220px; } .bs-img { width: 52px; height: 52px; } }
+
+/* Products page: brand filter next to sorting */
+.list-tools { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.list-tools select { font-size: 16px; }
+
+/* =========================================================
+   Watch & learn: video tiles open a player window
+   ========================================================= */
+button.h-video { border: 0; padding: 0; width: 100%; cursor: pointer; font: inherit; text-align: left; }
+.h-video-yt { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.vl { position: fixed; inset: 0; z-index: 90; background: rgba(15, 8, 17, .85); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn .2s ease both; }
+.vl-box { position: relative; width: min(960px, 100%); background: #000; border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, .5); animation: popIn .3s var(--ease) both; }
+.vl-frame { aspect-ratio: 16 / 9; }
+.vl-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+.vl-close { position: absolute; top: 8px; right: 8px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .9); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; }
+.vl-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--ink); color: var(--white); flex-wrap: wrap; }
+
+/* =========================================================
+   Admin: videos
+   ========================================================= */
+.vid-form { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px; }
+.vid-form-row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.vid-fields { flex: 1 1 280px; display: flex; flex-direction: column; gap: 10px; }
+.vid-fields label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; }
+.vid-fields input, .vid-fields select { border: 1.5px solid var(--line); border-radius: 10px; padding: 0 12px; min-height: 44px; font-size: 16px; font-weight: 400; background: var(--white); }
+.vid-fields input:focus, .vid-fields select:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+.vid-form-acts { display: flex; justify-content: flex-end; gap: 10px; }
+.vid-thumb { width: 160px; aspect-ratio: 16 / 9; border-radius: 10px; object-fit: cover; background: var(--mist); flex-shrink: 0; }
+.vid-thumb-empty { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; text-align: center; padding: 6px; }
+.vid-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.vid-item { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; flex-wrap: wrap; }
+.vid-item .vid-thumb { width: 120px; }
+.vid-item.vid-hidden { opacity: .6; }
+.vid-item-edit { padding: 0; border: 0; background: none; }
+.vid-item-edit .vid-form { width: 100%; margin: 0; }
+.vid-num { width: 26px; height: 26px; border-radius: 50%; background: var(--mist); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.vid-info { flex: 1 1 180px; display: flex; flex-direction: column; min-width: 0; }
+.vid-info strong { overflow: hidden; text-overflow: ellipsis; }
+.vid-acts { display: flex; align-items: center; gap: 4px; }
+@media (max-width: 700px) {
+  .vid-form-row .vid-thumb { width: 100%; }
+  .vid-item .vid-thumb { width: 96px; }
+  .vid-acts { width: 100%; justify-content: flex-end; }
+}
+
+/* Footer social icons: WhatsApp in its own green */
+.f-social { gap: 12px; }
+.f-social a { width: 44px; height: 44px; }
+.f-social a.f-soc-whatsapp { background: #25D366; border-color: #25D366; color: #FFFFFF; }
+.f-social a.f-soc-whatsapp:hover { background: #1EBE5A; border-color: #1EBE5A; }
+
+/* =========================================================
+   Brand strip: bigger cards with the brand's logo
+   ========================================================= */
+.bs { padding: 10px 0 18px; }
+.bs-track { gap: 20px; }
+.bs-card { width: 320px; gap: 18px; padding: 18px 22px 18px 18px; border-radius: 22px; }
+.bs-img { width: 104px; height: 104px; border-radius: 18px; font-size: 34px; padding: 10px; }
+.bs-img img { object-fit: contain; }
+/* An uploaded logo sits on white, so it reads the same for every brand */
+.bs-img.is-logo { background: var(--white); border: 1px solid var(--line); padding: 8px; }
+.bs-text strong { font-size: 21px; }
+.bs-text small { font-size: 14px; }
+@media (max-width: 640px) {
+  .bs-card { width: 268px; gap: 14px; padding: 14px 18px 14px 14px; }
+  .bs-img { width: 84px; height: 84px; border-radius: 16px; }
+  .bs-text strong { font-size: 18px; }
+}
+
+/* Footer: WhatsApp icon in its own green */
+.f-social .f-soc-whatsapp { background: #25D366; border-color: #25D366; color: #0B2E17; }
+.f-social .f-soc-whatsapp:hover { background: #1FBE59; border-color: #1FBE59; color: #0B2E17; }
+
+/* =========================================================
+   Admin: brand logos
+   ========================================================= */
+.brd-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.brd-item { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 12px; flex-wrap: wrap; }
+.brd-logo { width: 72px; height: 72px; flex-shrink: 0; border-radius: 12px; background: var(--mist); display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 24px; font-weight: 700; color: var(--teal); padding: 6px; }
+.brd-logo img { width: 100%; height: 100%; object-fit: contain; }
+.brd-logo.is-fallback { opacity: .75; }
+.brd-info { flex: 1 1 160px; display: flex; flex-direction: column; min-width: 0; }
+.brd-err { margin-top: 2px; background: none; padding: 0; }
+.brd-acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.brd-acts .is-busy { opacity: .6; pointer-events: none; }
+@media (max-width: 700px) { .brd-acts { width: 100%; justify-content: flex-end; } }

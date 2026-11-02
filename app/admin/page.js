@@ -6,6 +6,7 @@ import AdminGate from '@/components/AdminGate';
 import { useCatalog } from '@/lib/useCatalog';
 import { resizeToJpeg } from '@/lib/images';
 import PhotoManager from '@/components/PhotoManager';
+import { brandList } from '@/lib/brands';
 import ProductImage from '@/components/ProductImage';
 import { youtubeId } from '@/lib/youtube';
 
@@ -15,15 +16,14 @@ const EMPTY = { name: '', brand: '', category: '', subcategory: '', price: '', s
 const resizeImage = (file) => resizeToJpeg(file, 1200);
 
 function ProductForm({ initial, onSave, onCancel }) {
-  const { uploadImage } = useStore();
+  const { uploadImage, products } = useStore();
   const { categories: CATEGORIES, subsOf } = useCatalog();
+  const brandOptions = brandList(products).map((b) => b.name);
   const [form, setForm] = useState({ ...EMPTY, category: CATEGORIES.at(0) || '', ...initial, salePrice: initial?.salePrice ?? '' });
   const [photos, setPhotos] = useState(() => (initial?.images?.length ? initial.images : initial?.image ? [initial.image] : []).map((url) => ({ url })));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
-
-
 
   const submit = async (e) => {
     e.preventDefault();
@@ -55,14 +55,16 @@ function ProductForm({ initial, onSave, onCancel }) {
   };
 
 
-
   return (
     <div className="modal-back" role="dialog" aria-modal="true" aria-labelledby="form-title">
       <form className="modal" onSubmit={submit}>
         <h2 id="form-title">{initial?.id ? 'Edit product' : 'Add product'}</h2>
         <div className="form-grid">
           <label className="full">Product name<input value={form.name} onChange={set('name')} /></label>
-          <label>Brand<input value={form.brand} onChange={set('brand')} /></label>
+          <label>Brand
+            <input value={form.brand} onChange={set('brand')} list="brand-options" autoComplete="off" />
+            <datalist id="brand-options">{brandOptions.map((b) => (<option key={b} value={b} />))}</datalist>
+          </label>
           <label>Category
             <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value, subcategory: '' })}>
               {!CATEGORIES.includes(form.category) && form.category && <option value={form.category}>{form.category} (old)</option>}

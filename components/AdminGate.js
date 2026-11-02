@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { supabaseConfigured } from '@/lib/supabase';
-import { Logo } from './Icons';
 
-function Brand() {
+// The logo: white on the dark sidebar, purple on the white sign-in card.
+function Brand({ light = false }) {
   return (
     <div className="adm-brand">
-      <span className="adm-brand-mark"><Logo size={28} /></span>
-      <span>Marjan <small>Admin</small></span>
+      <img src={light ? '/brand/logo-color.svg' : '/brand/logo-white.svg'} alt="Marjan" width="118" height="30" />
+      <small>Admin</small>
     </div>
   );
 }
@@ -20,7 +20,7 @@ function Centered({ children }) {
   return (
     <div className="adm-center">
       <div className="adm-card">
-        <Brand />
+        <Brand light />
         {children}
       </div>
     </div>
@@ -65,6 +65,16 @@ const NAV = [
     href: '/admin',
     label: 'Products',
     icon: 'M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8',
+  },
+  {
+    href: '/admin/videos',
+    label: 'Videos',
+    icon: 'M4 5h16v14H4zM10 9l5 3-5 3z',
+  },
+  {
+    href: '/admin/brands',
+    label: 'Brands',
+    icon: 'M4 7h16v12H4zM4 7l2-3h12l2 3M9 11h6',
   },
   {
     href: '/admin/categories',

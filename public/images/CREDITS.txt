@@ -1,5 +1,6 @@
 Placeholder photos from Wikimedia Commons, all public domain or CC0 (free to use, no attribution required).
 Replace them with the store's own photos when available (keep the same file names).
 
-hero-reef-tank.jpg     "Black storm Clownfish among coral.jpg" (CC0)
 feature-clownfish.jpg  "Clownfish feeding.jpg" (CC0)
+
+Home page background video (public/videos): supplied by the store owner.

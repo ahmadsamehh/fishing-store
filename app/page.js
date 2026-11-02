@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useStore, formatPrice, finalPrice } from '@/lib/store';
 import { categoryHref } from '@/lib/catalog';
@@ -6,6 +7,9 @@ import { useCatalog } from '@/lib/useCatalog';
 import { perkIcons } from '@/components/Icons';
 import ProductImage from '@/components/ProductImage';
 import HeroVideo from '@/components/HeroVideo';
+import BrandStrip from '@/components/BrandStrip';
+import VideoLightbox from '@/components/VideoLightbox';
+import { brandList } from '@/lib/brands';
 import { youtubeId } from '@/lib/youtube';
 import { thumbOf } from '@/lib/images';
 import { WHATSAPP_NUMBER, PLACEHOLDER_IMAGES } from '@/lib/config';
@@ -20,13 +24,16 @@ const perks = [
 // Category tiles: each shows real products from that category.
 // art = product cut-outs in /public/tiles, size lg | md | sm.
 const T = (name, size = 'lg') => ({ src: `/tiles/${name}.webp`, size });
+// Each tile is matched to a category by a keyword, so renaming a category
+// ("Salt & Additives" to "Salts & Additives") never makes its tile disappear.
 const tiles = [
-  { category: 'Heating & Cooling', text: 'TECO chillers that keep your reef at a steady temperature, even through an Egyptian summer.', wide: true,
+  { category: 'Salt & Additives', match: 'salt', text: 'Aquaforest Reef Salt and Hybrid Pro Salt in 22 kg buckets, for stable, healthy reef water.', wide: true,
+    art: [T('salt-hybrid', 'md'), T('salt-reef', 'lg')] },
+  { category: 'Heating & Cooling', match: 'heating', text: 'TECO chillers for a steady temperature, even in summer.',
     art: [T('chiller-tk150', 'sm'), T('chiller-tk500', 'md'), T('chiller-tk1000', 'lg')] },
-  { category: 'Pumps & Powerheads', text: 'Sicce Multi return pumps, made in Italy.', art: [T('pump-800')] },
-  { category: 'Salt & Additives', text: 'Aquaforest Reef Salt and Hybrid Pro Salt in 22 kg buckets.', art: [T('salt-hybrid', 'md'), T('salt-reef', 'lg')] },
-  { category: 'Filtration', text: 'Solid filters in every size for clear, clean water.', art: [T('filters')] },
-  { category: 'Used', text: 'Pre-owned equipment at lower prices. New items added regularly.', badge: 'Pre-owned', art: [T('chiller-tk150', 'md')] },
+  { category: 'Pumps & Powerheads', match: 'pump', text: 'Sicce Multi return pumps, made in Italy.', art: [T('pump-800')] },
+  { category: 'Filtration', match: 'filtration', text: 'Solid filters in every size for clear, clean water.', art: [T('filters')] },
+  { category: 'Used', match: 'used', text: 'Pre-owned equipment at lower prices. New items added regularly.', badge: 'Pre-owned', art: [T('chiller-tk150', 'md')] },
   { deals: true, title: 'Deals', text: 'Discounts on selected products. Updated every week.', wide: true, badge: '%',
     art: [T('pump-800', 'sm'), T('salt-reef', 'md'), T('chiller-tk500', 'lg')] },
   { all: true, title: 'All products', text: 'Browse the full range, filter by category and sort by price.',
@@ -106,10 +113,19 @@ function PopularCard({ product }) {
 }
 
 export default function Home() {
-  const { products, ready, loadError } = useStore();
+  const { products, ready, loadError, videos: chosen, brandInfo } = useStore();
   const { categories: CATEGORIES } = useCatalog();
   // Hand-designed tiles show only while their category exists; new categories appear as chips.
-  const catTiles = tiles.filter((t) => t.category && CATEGORIES.includes(t.category));
+  // Show each tile under the category's real name from the dashboard.
+  // Category tiles, in the order written above (Salt first). Each tile finds its
+  // category by keyword, so renaming a category never makes its tile disappear.
+  const catTiles = tiles
+    .filter((t) => t.category)
+    .map((t) => {
+      const real = CATEGORIES.find((c) => c.toLowerCase().includes(t.match)) || (CATEGORIES.includes(t.category) ? t.category : null);
+      return real ? { ...t, category: real } : null;
+    })
+    .filter(Boolean);
   // On wide screens the grid has 3 columns. Deals and All products resize so the last row is always full.
   let pos = catTiles.reduce((n, t) => n + (t.wide ? 2 : 1), 0) % 3;
   const dealsSpan = 3 - pos >= 2 ? 2 : 1;
@@ -122,12 +138,19 @@ export default function Home() {
   ];
   const popular = pickPopular(products);
 
-  // One tile per unique video, newest products first.
+  // "Watch & learn": the videos chosen in /admin/videos (first 6).
+  // Until that list is set up, it falls back to the products' own videos.
+  const [playing, setPlaying] = useState(null);
   const seen = new Set();
-  const videos = products
-    .map((p) => ({ p, id: youtubeId(p.youtubeUrl) }))
-    .filter(({ p, id }) => id && hasRealPhoto(p) && !seen.has(id) && seen.add(id))
+  const videos = (chosen
+    ? chosen.map((v) => ({ id: youtubeId(v.youtubeUrl), title: v.title, product: products.find((p) => p.id === v.productId) }))
+    : products.filter(hasRealPhoto).map((p) => ({ id: youtubeId(p.youtubeUrl), title: p.name, product: p }))
+  )
+    .filter((v) => v.id && !seen.has(v.id) && seen.add(v.id))
+    .map((v) => ({ ...v, title: v.title || v.product?.name || '' }))
     .slice(0, 6);
+
+  const brands = brandList(products, hasRealPhoto, brandInfo || []);
 
   return (
     <>
@@ -157,6 +180,17 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* Shop by brand */}
+      {brands.length > 1 && (
+        <section className="h-section h-brands">
+          <div className="wrap h-head reveal">
+            <h2>Shop by <strong>brand</strong></h2>
+            <p>Original equipment and supplies from the brands reefers trust.</p>
+          </div>
+          <BrandStrip brands={brands} />
+        </section>
+      )}
 
       {/* 3. Category tiles with product images */}
       <section id="categories" className="wrap h-section">
@@ -215,21 +249,21 @@ export default function Home() {
         <section className="wrap h-section">
           <div className="h-head reveal">
             <h2>Watch <strong>&amp; learn</strong></h2>
-            <p>See products in action before you buy. Tap one to open the product and watch.</p>
+            <p>See products in action before you buy.</p>
           </div>
           <div className="h-videos">
-            {videos.map(({ p, id }) => (
-              <Link key={id} href={`/products/${p.id}`} className="h-video reveal">
-                <span className="h-video-bg" aria-hidden="true">
-                  <img src={thumbOf(p.image)} alt="" loading="lazy" decoding="async" />
-                </span>
+            {videos.map((v) => (
+              <button type="button" key={v.id} className="h-video reveal" onClick={() => setPlaying(v)} aria-label={`Play video: ${v.title || 'video'}`}>
+                <img className="h-video-yt" src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" decoding="async" />
                 <span className="h-video-play" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg></span>
-                <span className="h-video-name">{p.name}</span>
-              </Link>
+                <span className="h-video-name">{v.title}</span>
+              </button>
             ))}
           </div>
         </section>
       )}
+
+      {playing && <VideoLightbox video={playing} onClose={() => setPlaying(null)} />}
 
       {/* 6. Two feature panels */}
       <section className="wrap h-section h-features">

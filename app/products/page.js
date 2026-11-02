@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useStore, finalPrice } from '@/lib/store';
 import { useCatalog } from '@/lib/useCatalog';
 import ProductCard from '@/components/ProductCard';
+import { brandKey, brandList } from '@/lib/brands';
 
 function Listing() {
   const params = useSearchParams();
@@ -15,6 +16,9 @@ function Listing() {
   const sub = params.get('sub') || '';
   const sale = params.get('sale') === '1';
   const sort = params.get('sort') || 'featured';
+  const brand = params.get('brand') || '';
+  const brands = brandList(products);
+  const brandName = brands.find((b) => b.key === brand)?.name || brand;
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(params.toString());
@@ -26,6 +30,7 @@ function Listing() {
   let list = products.filter((p) => {
     if (category && p.category !== category) return false;
     if (sub && p.subcategory !== sub) return false;
+    if (brand && brandKey(p.brand) !== brand) return false;
     if (sale && !(p.salePrice && p.salePrice < p.price)) return false;
     if (q && !`${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(q)) return false;
     return true;
@@ -35,7 +40,7 @@ function Listing() {
   if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
 
   if (sort === 'new') list = [...list]; // already newest first from the database
-  const title = sale ? 'Deals' : sub || category || (q ? `Results for "${params.get('q')}"` : 'All products');
+  const title = sale ? 'Deals' : sub || category || (brand ? brandName : '') || (q ? `Results for "${params.get('q')}"` : 'All products');
 
   return (
     <div className="wrap listing">
@@ -58,6 +63,16 @@ function Listing() {
       <section>
         <div className="section-head">
           <h1>{title}</h1>
+          <div className="list-tools">
+          {brands.length > 0 && (
+            <label className="sort">
+              Brand
+              <select value={brand} onChange={(e) => setParam('brand', e.target.value)}>
+                <option value="">All brands</option>
+                {brands.map((b) => (<option key={b.key} value={b.key}>{b.name} ({b.count})</option>))}
+              </select>
+            </label>
+          )}
           <label className="sort">
             Sort by
             <select value={sort} onChange={(e) => setParam('sort', e.target.value)}>
@@ -68,6 +83,7 @@ function Listing() {
               <option value="name">Name</option>
             </select>
           </label>
+          </div>
         </div>
         <p className="muted">{list.length} products</p>
         {!ready ? (

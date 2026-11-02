@@ -6,6 +6,7 @@ import { useStore, formatPrice, finalPrice } from '@/lib/store';
 import ProductMedia from '@/components/ProductMedia';
 import QtyInput from '@/components/QtyInput';
 import ProductCard from '@/components/ProductCard';
+import { brandHref } from '@/lib/brands';
 import { categoryHref } from '@/lib/catalog';
 
 export default function ProductPage() {
@@ -56,7 +57,7 @@ export default function ProductPage() {
             <ProductMedia product={product} />
           </div>
           <div className="pdp-hero-info">
-            {product.brand && <div className="pdp-brand">{product.brand}</div>}
+            {product.brand && <Link className="pdp-brand" href={brandHref(product.brand)}>{product.brand}</Link>}
             <h1>{product.name}</h1>
             {lead && <p className="pdp-lead">{lead}</p>}
             <hr />

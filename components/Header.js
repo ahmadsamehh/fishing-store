@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useStore } from '@/lib/store';
-import { SearchIcon, UserIcon, CartIcon, Logo } from './Icons';
+import { SearchIcon, UserIcon, CartIcon } from './Icons';
 import MegaMenu from './MegaMenu';
 
 export default function Header() {
@@ -35,8 +35,7 @@ export default function Header() {
       <div className="topbar">Delivery across Egypt · Order easily on WhatsApp</div>
       <div className="wrap header-main">
         <Link href="/" className="brand">
-          <span className="brand-mark"><Logo /></span>
-          <span className="brand-name">Marjan</span>
+          <img className="brand-logo" src="/brand/logo-color.svg" alt="Marjan" width="157" height="40" />
         </Link>
         <Suspense fallback={<span className="mm-toggle">Menu</span>}>
           <MegaMenu />
