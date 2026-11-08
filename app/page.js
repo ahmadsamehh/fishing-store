@@ -16,7 +16,7 @@ import { WHATSAPP_NUMBER, PLACEHOLDER_IMAGES } from '@/lib/config';
 
 const perks = [
   { title: 'Delivery across Egypt', sub: 'To every governorate', icon: perkIcons.delivery },
-  { title: 'Trusted brands', sub: 'TECO, Sicce and Aquaforest', icon: perkIcons.genuine },
+  { title: 'Exclusive Distributor', sub: 'Aquaforest , TECO and SICCE', icon: perkIcons.genuine },
   { title: 'Easy ordering', sub: 'Check out and confirm on WhatsApp', icon: perkIcons.whatsapp },
   { title: 'Reef experts', sub: 'Ask us before you buy', icon: perkIcons.experts },
 ];
@@ -27,14 +27,14 @@ const T = (name, size = 'lg') => ({ src: `/tiles/${name}.webp`, size });
 // Each tile is matched to a category by a keyword, so renaming a category
 // ("Salt & Additives" to "Salts & Additives") never makes its tile disappear.
 const tiles = [
-  { category: 'Salt & Additives', match: 'salt', text: 'Aquaforest Reef Salt and Hybrid Pro Salt in 22 kg buckets, for stable, healthy reef water.', wide: true,
+  { category: 'Salt & Additives', match: 'salt', text: "Build a strong foundation for your reef. Discover Marjan's marine salts and supplements that help maintain water chemistry, replenish essential elements, and support healthy coral growth.", wide: true,
     art: [T('salt-hybrid', 'md'), T('salt-reef', 'lg')] },
-  { category: 'Heating & Cooling', match: 'heating', text: 'TECO chillers for a steady temperature, even in summer.',
+  { category: 'Heating & Cooling', match: 'heating', text: "Maintain a stable temperature throughout the year. Explore Marjan's chillers, heaters, and temperature controllers suited to your aquarium's size and needs, helping create a consistent environment for your fish and corals.", wide: true,
     art: [T('chiller-tk150', 'sm'), T('chiller-tk500', 'md'), T('chiller-tk1000', 'lg')] },
-  { category: 'Pumps & Powerheads', match: 'pump', text: 'Sicce Multi return pumps, made in Italy.', art: [T('pump-800')] },
-  { category: 'Filtration', match: 'filtration', text: 'Solid filters in every size for clear, clean water.', art: [T('filters')] },
+  { category: 'Pumps & Powerheads', match: 'pump', text: "Create the flow your reef needs. Explore Marjan's circulation pumps and wavemakers that help distribute nutrients, keep particles suspended for filtration, and deliver water movement throughout your aquarium.", art: [T('pump-800')] },
+  { category: 'Filtration', match: 'filtration', text: "Keep your aquarium water clean and clear with Marjan's effective filtration tools. From protein skimmers to filter media, discover solutions that help remove waste and support the biological balance of your marine aquarium.", art: [T('filters')] },
   { category: 'Used', match: 'used', text: 'Pre-owned equipment at lower prices. New items added regularly.', badge: 'Pre-owned', art: [T('chiller-tk150', 'md')] },
-  { deals: true, title: 'Deals', text: 'Discounts on selected products. Updated every week.', wide: true, badge: '%',
+  { deals: true, title: 'Deals', text: 'Discounts on selected products. Updated every week.', badge: '%',
     art: [T('pump-800', 'sm'), T('salt-reef', 'md'), T('chiller-tk500', 'lg')] },
   { all: true, title: 'All products', text: 'Browse the full range, filter by category and sort by price.',
     art: [T('salt-hybrid', 'sm'), T('chiller-tk1000', 'lg'), T('pump-800', 'sm')] },
@@ -159,7 +159,7 @@ export default function Home() {
         <HeroVideo className="h-hero-bg" />
         <div className="wrap h-hero-inner">
           <h1>Built for <strong>reefers</strong>.<br />Delivered across <strong>Egypt</strong>.</h1>
-          <p>Chillers, pumps, filtration and salt from trusted brands, with advice from people who actually keep reefs.</p>
+          <p>Bring the beauty of the ocean into your home. Explore a carefully selected range of premium marine brands and supplies, from salts and supplements to filtration and temperature control, to help your underwater world thrive.</p>
           <div className="h-hero-cta">
             <Link href="/products" className="btn btn-pink">Shop all products</Link>
             <a href="#categories" className="btn btn-ghost">Browse categories</a>
