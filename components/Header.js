@@ -32,7 +32,7 @@ export default function Header() {
 
   return (
     <header className="site-header">
-      <div className="topbar">Delivery across Egypt · Order easily on WhatsApp</div>
+      <div className="topbar">Delivery across Egypt· Free Shipping for orders over 10000 EGP</div>
       <div className="wrap header-main">
         <Link href="/" className="brand">
           <img className="brand-logo" src="/brand/logo-color.svg" alt="Marjan" width="157" height="40" />

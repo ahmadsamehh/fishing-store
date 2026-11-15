@@ -667,6 +667,7 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
 .h-features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .h-feature { position: relative; overflow: hidden; border-radius: 18px; min-height: 380px; display: flex; align-items: flex-end; color: var(--white); isolation: isolate; }
 .h-feature img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.h-feature img.h-feature-image-contain { object-fit: contain; }
 .h-feature-photo::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(30, 1, 35, .92) 0%, rgba(30, 1, 35, .35) 60%, rgba(30, 1, 35, .1) 100%); }
 .h-feature-solid { background: radial-gradient(circle at 85% 15%, #6A1A7A 0%, var(--purple) 55%, var(--ink) 100%); }
 .h-feature-text { padding: 36px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; max-width: 520px; }
@@ -893,7 +894,7 @@ details.order[open] > *:not(summary) { animation: fadeIn .3s ease both; }
 .h-tile.wide .h-tile-art { width: 50%; right: 8%; }
 .h-tile .h-tile-art img { position: relative; inset: auto; height: auto; max-height: 100%; object-fit: contain; object-position: bottom; z-index: auto; filter: drop-shadow(0 22px 26px rgba(0, 0, 0, .45)); transition: transform .6s var(--ease); }
 /* Widths depend on how many products a tile shows, so they always fit their area */
-.n-1 .s-lg { width: 78%; } .n-1 .s-md { width: 64%; } .n-1 .s-sm { width: 52%; }
+.n-1 .s-lg { width: 78%; } .n-1 .s-md { width: 64%; } .n-1 .s-sm { width: 52%; } .n-1 .s-xl { width: 112%; }
 .n-2 img + img { margin-left: -14%; } .n-2 .s-lg { width: 62%; } .n-2 .s-md { width: 50%; } .n-2 .s-sm { width: 40%; }
 .n-3 img + img { margin-left: -12%; } .n-3 .s-lg { width: 50%; } .n-3 .s-md { width: 42%; } .n-3 .s-sm { width: 34%; }
 .h-tile:hover .h-tile-art img { transform: translateY(-8px) scale(1.04); }
