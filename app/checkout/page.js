@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { useStore, formatPrice, finalPrice } from '@/lib/store';
 import { WHATSAPP_NUMBER } from '@/lib/config';
 import { GOVERNORATES, isValidPhone } from '@/lib/egypt';
+import { deliveryFor } from '@/lib/delivery';
 
 export default function CheckoutPage() {
-  const { cart, products, ready, session, loadProfile, saveProfile, clearCart, placeOrder } = useStore();
+  const { cart, products, ready, session, loadProfile, saveProfile, clearCart, placeOrder, delivery } = useStore();
   const [f, setF] = useState({ fullName: '', phone: '', city: '', address: '', notes: '' });
   const [location, setLocation] = useState('');
   const [locStatus, setLocStatus] = useState('');
@@ -23,7 +24,12 @@ export default function CheckoutPage() {
   }, [session?.user?.id]);
 
   const lines = cart.map((c) => ({ ...c, product: products.find((p) => p.id === c.id) })).filter((l) => l.product);
-  const total = lines.reduce((sum, l) => sum + finalPrice(l.product) * l.qty, 0);
+  const subtotal = lines.reduce((sum, l) => sum + finalPrice(l.product) * l.qty, 0);
+  // Delivery is worked out from the store's rules and the chosen governorate.
+  const ship = deliveryFor(subtotal, f.city, delivery);
+  const total = subtotal + ship.fee;
+  const missing = delivery.freeOver > 0 ? delivery.freeOver - subtotal : 0;
+  const deliveryHint = missing > 0 ? `Add ${formatPrice(missing)} more for free delivery.` : 'Delivery is included in the total.';
 
   const shareLocation = () => {
     if (!navigator.geolocation) return setLocStatus('Your browser cannot share location. Type your address instead.');
@@ -60,7 +66,9 @@ export default function CheckoutPage() {
       '',
       ...items,
       '',
-      `Subtotal: ${formatPrice(total)}`,
+      `Subtotal: ${formatPrice(subtotal)}`,
+      `Delivery: ${ship.free ? 'Free' : formatPrice(ship.fee)}`,
+      `Total: ${formatPrice(total)}`,
       '',
       `Name: ${f.fullName.trim()}`,
       `Phone: ${f.phone.trim()}`,
@@ -90,7 +98,9 @@ export default function CheckoutPage() {
           price: finalPrice(l.product),
           image: l.product.image || '',
         })),
-        subtotal: total,
+        subtotal,
+        deliveryFee: ship.fee,
+        total,
         fullName: f.fullName.trim(),
         phone: f.phone.trim(),
         city: f.city,
@@ -176,8 +186,19 @@ export default function CheckoutPage() {
               <li key={l.id}><span>{l.qty} × {l.product.name}</span><strong>{formatPrice(finalPrice(l.product) * l.qty)}</strong></li>
             ))}
           </ul>
-          <div className="row"><span>Subtotal</span><strong>{formatPrice(total)}</strong></div>
-          <p className="muted">Delivery cost is confirmed with you on WhatsApp.</p>
+          <div className="row row-sub"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+          <div className="row row-sub">
+            <span>Delivery{f.city ? ` to ${f.city}` : ''}</span>
+            <span className={ship.free ? 'ship-free' : ''}>{f.city ? (ship.free ? 'Free' : formatPrice(ship.fee)) : '—'}</span>
+          </div>
+          <div className="row"><span>Total</span><strong>{formatPrice(total)}</strong></div>
+          <p className="muted">
+            {!f.city
+              ? 'Choose your governorate to see the delivery cost.'
+              : ship.free
+                ? `${ship.reason}.`
+                : deliveryHint}
+          </p>
           <Link href="/cart" className="link-btn">Edit cart</Link>
         </aside>
       </div>

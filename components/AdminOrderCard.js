@@ -2,12 +2,32 @@
 import { useState } from 'react';
 import { useStore, formatPrice } from '@/lib/store';
 import { STATUSES, STATUS_LABELS, formatOrderDate, waNumber } from '@/lib/orders';
+import { deliveryFor } from '@/lib/delivery';
 
 export default function OrderCard({ order, onUpdated }) {
-  const { adminUpdateOrderStatus } = useStore();
+  const { adminUpdateOrderStatus, adminSetOrderDelivery, delivery } = useStore();
   const [status, setStatus] = useState(order.status);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
+  // Delivery fee for this order: what was saved, or the store's rule if it is an older order.
+  const suggested = deliveryFor(Number(order.subtotal), order.city, delivery);
+  const savedFee = order.delivery_fee === null || order.delivery_fee === undefined ? suggested.fee : Number(order.delivery_fee);
+  const [fee, setFee] = useState(String(savedFee));
+  const [feeBusy, setFeeBusy] = useState(false);
+  const orderTotal = Number(order.subtotal) + (Number(fee) || 0);
+
+  const saveFee = async () => {
+    setFeeBusy(true);
+    setError('');
+    try {
+      const updated = await adminSetOrderDelivery(order.id, fee, order.subtotal);
+      onUpdated(updated);
+      setMsg(`Delivery fee set to ${formatPrice(Number(fee) || 0)}. Tell the customer on WhatsApp.`);
+    } catch (err) {
+      setError(err.message);
+    }
+    setFeeBusy(false);
+  };
   const [error, setError] = useState('');
 
   const changed = status !== order.status;
@@ -31,7 +51,8 @@ export default function OrderCard({ order, onUpdated }) {
 
   // Ready-made WhatsApp message about the current status.
   const firstName = (order.full_name || '').split(' ')[0];
-  const notifyText = `Hi ${firstName}, your order #${order.code} is now: ${STATUS_LABELS[order.status]}. Thank you for shopping with Marjan!`;
+  const feeLine = (Number(fee) || 0) === 0 ? 'free delivery' : `delivery ${formatPrice(Number(fee) || 0)}`;
+  const notifyText = `Hi ${firstName}, your order #${order.code} is now: ${STATUS_LABELS[order.status]}. Total: ${formatPrice(orderTotal)} (${feeLine}). Thank you for shopping with Marjan!`;
   const customerWa = waNumber(order.phone);
 
   return (
@@ -41,7 +62,7 @@ export default function OrderCard({ order, onUpdated }) {
         <span className="muted">{formatOrderDate(order.created_at, true)}</span>
         <span className="ao-name">{order.full_name}{isGuest && <span className="ao-guest">Guest</span>}</span>
         <span className={`pill pill-${order.status}`}>{STATUS_LABELS[order.status] || order.status}</span>
-        <strong className="order-total">{formatPrice(order.subtotal)}</strong>
+        <strong className="order-total">{formatPrice(order.total ?? orderTotal)}</strong>
       </summary>
 
       <div className="admin-order-body">
@@ -55,7 +76,25 @@ export default function OrderCard({ order, onUpdated }) {
                   <span>{formatPrice(it.price * it.qty)}</span>
                 </li>
               ))}
-              <li className="order-sum"><span>Subtotal</span><strong>{formatPrice(order.subtotal)}</strong></li>
+              <li className="order-sum"><span>Subtotal</span><span>{formatPrice(order.subtotal)}</span></li>
+              <li className="order-fee">
+                <label htmlFor={`fee-${order.id}`}>Delivery</label>
+                <span className="order-fee-input">
+                  <input
+                    id={`fee-${order.id}`}
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={fee}
+                    onChange={(e) => { setFee(e.target.value); setMsg(''); }}
+                    aria-label="Delivery fee in EGP"
+                  />
+                  <button type="button" className="btn btn-outline btn-sm" onClick={saveFee} disabled={feeBusy || Number(fee) === savedFee}>
+                    {feeBusy ? 'Saving…' : 'Save'}
+                  </button>
+                </span>
+              </li>
+              <li className="order-sum order-grand"><span>Total</span><strong>{formatPrice(orderTotal)}</strong></li>
             </ul>
           </div>
           <div className="ao-block">

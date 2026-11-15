@@ -67,6 +67,11 @@ const NAV = [
     icon: 'M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8',
   },
   {
+    href: '/admin/delivery',
+    label: 'Delivery',
+    icon: 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM17.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z',
+  },
+  {
     href: '/admin/videos',
     label: 'Videos',
     icon: 'M4 5h16v14H4zM10 9l5 3-5 3z',

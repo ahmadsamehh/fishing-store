@@ -1292,3 +1292,40 @@ button.h-video { border: 0; padding: 0; width: 100%; cursor: pointer; font: inhe
 .h-tile.wide p { -webkit-line-clamp: 10; }
 .h-tile { align-items: center; padding-top: 50px; }
 @media (max-width: 640px) { .h-tile p { -webkit-line-clamp: 3; } }
+
+/* Checkout summary: subtotal, delivery and total */
+.cart-summary .row-sub { font-size: 15px; color: var(--muted); }
+.cart-summary .row-sub + .row { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 2px; }
+.cart-summary .ship-free { color: var(--teal); font-weight: 600; }
+
+/* Admin order: delivery fee and total */
+.order-fee { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; flex-wrap: wrap; }
+.order-fee label { color: var(--muted); }
+.order-fee-input { display: inline-flex; gap: 6px; align-items: center; }
+.order-fee-input input { width: 92px; border: 1.5px solid var(--line); border-radius: 10px; padding: 0 10px; min-height: 38px; font-size: 16px; text-align: right; }
+.order-fee-input input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+.order-grand { border-top: 1px solid var(--line); padding-top: 8px; font-size: 16px; }
+
+/* Admin: delivery settings */
+.dlv-form { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 22px; max-width: 760px; }
+.dlv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.dlv-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; }
+.dlv-form input, .dlv-form select { border: 1.5px solid var(--line); border-radius: 10px; padding: 0 12px; min-height: 44px; font-size: 16px; font-weight: 400; background: var(--white); }
+.dlv-form input:focus, .dlv-form select:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+.dlv-form small { font-weight: 400; }
+.dlv-block { display: flex; flex-direction: column; gap: 10px; }
+.dlv-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.dlv-chip { cursor: pointer; border: 1px solid var(--line); background: var(--white); }
+.dlv-chip.on { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); font-weight: 600; }
+.dlv-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.dlv-list li { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--mist); border-radius: 10px; }
+.dlv-list li span:first-child { flex: 1; }
+.dlv-add { display: flex; gap: 8px; flex-wrap: wrap; }
+.dlv-add select { flex: 1 1 200px; }
+.dlv-add input { width: 110px; }
+.dlv-try { background: var(--mist); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.dlv-try-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.dlv-try select { flex: 0 0 200px; background: var(--white); }
+.dlv-try ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.dlv-acts { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 700px) { .dlv-try select { flex: 1 1 100%; } }
